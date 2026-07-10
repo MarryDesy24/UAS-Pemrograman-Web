@@ -10,6 +10,7 @@ export default function GuruPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingGuru, setEditingGuru] = useState<User | null>(null);
+  const [resettingId, setResettingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     nama: '',
     email: '',
@@ -92,6 +93,26 @@ export default function GuruPage() {
     }
   };
 
+  const handleResetPassword = async (user: User) => {
+    if (!confirm(`Kirim link reset password ke ${user.email}?`)) return;
+
+    setResettingId(user.id);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+
+      if (error) throw error;
+
+      toast.success(`Link reset password sudah dikirim ke ${user.email}`);
+    } catch (error: any) {
+      toast.error(error.message || 'Gagal mengirim reset password');
+    } finally {
+      setResettingId(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -135,6 +156,13 @@ export default function GuruPage() {
                       className="text-indigo-600 hover:text-indigo-800"
                     >
                       Edit
+                    </button>
+                    <button
+                      onClick={() => handleResetPassword(g)}
+                      disabled={resettingId === g.id}
+                      className="text-amber-600 hover:text-amber-800 disabled:opacity-50"
+                    >
+                      {resettingId === g.id ? 'Mengirim...' : 'Reset Password'}
                     </button>
                     <button
                       onClick={() => handleDelete(g.id)}
