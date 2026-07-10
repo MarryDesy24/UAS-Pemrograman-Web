@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Material, Module } from '@/lib/types';
+import { Material, Module, User } from '@/lib/types';
+import { getCurrentUser } from '@/lib/auth';
 import toast from 'react-hot-toast';
 
 export default function MateriPage() {
+  const [user, setUser] = useState<User | null>(null);
   const [materials, setMaterials] = useState<(Material & { module_title?: string })[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,16 +23,21 @@ export default function MateriPage() {
   });
   const [uploading, setUploading] = useState(false);
 
+  const isGuru = user?.role === 'guru';
+
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const { data: user } = await supabase.auth.getUser();
+    const currentUser = await getCurrentUser();
+    setUser(currentUser);
 
     const [materialsRes, modulesRes] = await Promise.all([
       supabase.from('materials').select('*').order('created_at', { ascending: false }),
-      supabase.from('modules').select('*').eq('teacher_id', user.user?.id || '').order('title'),
+      currentUser?.role === 'guru'
+        ? supabase.from('modules').select('*').eq('teacher_id', currentUser.id).order('title')
+        : Promise.resolve({ data: [] }),
     ]);
 
     if (materialsRes.data) {
@@ -146,12 +153,14 @@ export default function MateriPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Materi</h1>
-        <button
-          onClick={() => { setEditingMaterial(null); resetForm(); setShowModal(true); }}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          + Tambah Materi
-        </button>
+        {isGuru && (
+          <button
+            onClick={() => { setEditingMaterial(null); resetForm(); setShowModal(true); }}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            + Tambah Materi
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -177,18 +186,25 @@ export default function MateriPage() {
                 {mat.youtube_url && (
                   <a href={mat.youtube_url} target="_blank" rel="noopener noreferrer" className="text-sm text-red-600 hover:text-red-800">YouTube</a>
                 )}
-                <button onClick={() => handleEdit(mat)} className="text-sm text-indigo-600 hover:text-indigo-800">Edit</button>
-                <button onClick={() => handleDelete(mat.id)} className="text-sm text-red-600 hover:text-red-800">Hapus</button>
+                {isGuru && (
+                  <>
+                    <button onClick={() => handleEdit(mat)} className="text-sm text-indigo-600 hover:text-indigo-800">Edit</button>
+                    <button onClick={() => handleDelete(mat.id)} className="text-sm text-red-600 hover:text-red-800">Hapus</button>
+                  </>
+                )}
               </div>
             </div>
           ))}
           {materials.length === 0 && (
-            <div className="col-span-full text-center py-12 text-gray-500">Belum ada materi</div>
+            <div className="col-span-full text-center py-12 text-gray-500">
+              {isGuru ? 'Belum ada materi' : 'Belum ada materi yang tersedia'}
+            </div>
           )}
         </div>
       )}
 
-      {showModal && (
+      {/* Modal hanya untuk guru */}
+      {showModal && isGuru && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto">
           <div className="bg-white rounded-xl p-6 w-full max-w-lg my-8">
             <h2 className="text-lg font-semibold mb-4">{editingMaterial ? 'Edit Materi' : 'Tambah Materi'}</h2>
