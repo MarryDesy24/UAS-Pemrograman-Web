@@ -5,28 +5,19 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { signIn } from '@/lib/auth';
-import { SCHOOL_CONFIG, isValidSchoolEmail } from '@/lib/config';
+import { SCHOOL_CONFIG } from '@/lib/config';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [emailError, setEmailError] = useState('');
-
-  const validateEmail = (value: string) => {
-    if (value && value.includes('@') && !isValidSchoolEmail(value)) {
-      setEmailError('Email tidak valid. Gunakan email sekolah.');
-    } else {
-      setEmailError('');
-    }
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isValidSchoolEmail(email)) {
-      toast.error('Gunakan email sekolah yang valid');
+    if (!email || !password) {
+      toast.error('Masukkan email dan password');
       return;
     }
 
@@ -56,24 +47,19 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Sekolah
+                Email
               </label>
               <input
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => { setEmail(e.target.value); validateEmail(e.target.value); }}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${
-                  emailError ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="nama@student.smk.id"
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                placeholder="email@domain.com"
                 required
               />
-              {emailError && (
-                <p className="text-xs text-red-500 mt-1">{emailError}</p>
-              )}
               <p className="text-xs text-gray-400 mt-1">
-                Siswa: <strong>@student.smk.id</strong> | Guru: <strong>@guru.smk.id</strong>
+                Admin: email bebas | Guru: <strong>@guru.smk.id</strong> | Siswa: <strong>@student.smk.id</strong>
               </p>
             </div>
 
@@ -104,7 +90,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading || !!emailError}
+              disabled={loading}
               className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Masuk...' : 'Masuk'}
