@@ -10,38 +10,29 @@ import { SCHOOL_CONFIG, isValidSchoolEmail, detectRoleFromEmail } from '@/lib/co
 export default function RegisterPage() {
   const router = useRouter();
   const [nama, setNama] = useState('');
-  const [email, setEmail] = useState('');
+  const [emailLocal, setEmailLocal] = useState('');
+  const [emailDomain, setEmailDomain] = useState<'student.smk.id' | 'guru.smk.id'>('student.smk.id');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'guru' | 'siswa'>('siswa');
   const [loading, setLoading] = useState(false);
-  const [emailError, setEmailError] = useState('');
-  const [detectedRole, setDetectedRole] = useState<'guru' | 'siswa' | null>(null);
 
-  // Auto-detect role saat email berubah
+  // Gabungkan local + domain jadi email lengkap
+  const email = emailLocal ? `${emailLocal}@${emailDomain}` : '';
+
+  // Auto-detect role saat domain berubah
   useEffect(() => {
-    if (email && email.includes('@')) {
-      if (isValidSchoolEmail(email)) {
-        const detected = detectRoleFromEmail(email);
-        if (detected) {
-          setRole(detected);
-          setDetectedRole(detected);
-        }
-        setEmailError('');
-      } else {
-        setEmailError('Email tidak valid. Gunakan email sekolah.');
-        setDetectedRole(null);
-      }
+    if (emailDomain === 'guru.smk.id') {
+      setRole('guru');
     } else {
-      setEmailError('');
-      setDetectedRole(null);
+      setRole('siswa');
     }
-  }, [email]);
+  }, [emailDomain]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isValidSchoolEmail(email)) {
-      toast.error('Gunakan email sekolah yang valid');
+    if (!emailLocal.trim()) {
+      toast.error('Masukkan email Anda');
       return;
     }
 
@@ -101,32 +92,27 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email Sekolah</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
-                  emailError ? 'border-red-300 bg-red-50' : 'border-gray-300'
-                }`}
-                placeholder="nama@student.smk.id"
-                required
-              />
-              {emailError && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {emailError}
-                </p>
-              )}
-              {detectedRole && !emailError && (
-                <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  Terdeteksi: <strong className="capitalize">{detectedRole}</strong>
-                </p>
-              )}
+              <div className="flex">
+                <input
+                  type="text"
+                  value={emailLocal}
+                  onChange={(e) => setEmailLocal(e.target.value)}
+                  className="flex-1 px-4 py-3 border border-r-0 border-gray-300 rounded-l-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                  placeholder="nama"
+                  required
+                />
+                <select
+                  value={emailDomain}
+                  onChange={(e) => setEmailDomain(e.target.value as 'student.smk.id' | 'guru.smk.id')}
+                  className="px-3 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-gray-50 text-sm font-medium text-gray-700 cursor-pointer"
+                >
+                  <option value="student.smk.id">@student.smk.id</option>
+                  <option value="guru.smk.id">@guru.smk.id</option>
+                </select>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">
+                Pilih domain sesuai peran Anda
+              </p>
             </div>
 
             <div>
@@ -147,7 +133,7 @@ export default function RegisterPage() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setRole('guru')}
+                  onClick={() => { setRole('guru'); setEmailDomain('guru.smk.id'); }}
                   className={`p-4 rounded-lg border-2 transition-all text-center ${
                     role === 'guru'
                       ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
@@ -156,11 +142,10 @@ export default function RegisterPage() {
                 >
                   <div className="text-2xl mb-1">👨‍🏫</div>
                   <div className="font-medium text-sm">Guru</div>
-                  <div className="text-xs text-gray-400 mt-1">@guru.smk.id</div>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setRole('siswa')}
+                  onClick={() => { setRole('siswa'); setEmailDomain('student.smk.id'); }}
                   className={`p-4 rounded-lg border-2 transition-all text-center ${
                     role === 'siswa'
                       ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
@@ -169,14 +154,13 @@ export default function RegisterPage() {
                 >
                   <div className="text-2xl mb-1">🎓</div>
                   <div className="font-medium text-sm">Siswa</div>
-                  <div className="text-xs text-gray-400 mt-1">@student.smk.id</div>
                 </button>
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={loading || !!emailError}
+              disabled={loading || !emailLocal.trim()}
               className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Mendaftar...' : 'Daftar'}
