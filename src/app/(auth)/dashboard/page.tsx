@@ -196,9 +196,16 @@ export default function DashboardPage() {
   if (user?.role === 'admin') {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin</h1>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin</h1>
+            <p className="text-sm text-gray-500">Kelola seluruh data sekolah</p>
+          </div>
+        </div>
+
+        {/* Statistik Utama */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <Link href="/dashboard/guru" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,8 +217,9 @@ export default function DashboardPage() {
                 <p className="text-2xl font-bold text-gray-900">{stats.totalGuru}</p>
               </div>
             </div>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          </Link>
+
+          <Link href="/dashboard/siswa" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -223,8 +231,9 @@ export default function DashboardPage() {
                 <p className="text-2xl font-bold text-gray-900">{stats.totalSiswa}</p>
               </div>
             </div>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          </Link>
+
+          <Link href="/dashboard/kelas" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,8 +245,9 @@ export default function DashboardPage() {
                 <p className="text-2xl font-bold text-gray-900">{stats.totalKelas}</p>
               </div>
             </div>
-          </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          </Link>
+
+          <Link href="/dashboard/mata-pelajaran" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -248,6 +258,116 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-500">Mata Pelajaran</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalMataPelajaran}</p>
               </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h2 className="font-semibold text-gray-900 mb-4">Aksi Cepat</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Link href="/dashboard/guru" className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <span className="text-sm font-medium text-gray-700">Tambah Guru</span>
+            </Link>
+            <Link href="/dashboard/siswa" className="flex items-center gap-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <span className="text-sm font-medium text-gray-700">Tambah Siswa</span>
+            </Link>
+            <Link href="/dashboard/kelas" className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <span className="text-sm font-medium text-gray-700">Buat Kelas</span>
+            </Link>
+            <Link href="/dashboard/mata-pelajaran" className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <span className="text-sm font-medium text-gray-700">Tambah Mata Pelajaran</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Info Ringkas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="font-semibold text-gray-900 mb-4">Ringkasan Sistem</h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                <span className="text-sm text-gray-600">Total Pengguna</span>
+                <span className="font-medium text-gray-900">{stats.totalGuru + stats.totalSiswa + 1}</span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                <span className="text-sm text-gray-600">Rasio Guru : Siswa</span>
+                <span className="font-medium text-gray-900">
+                  {stats.totalSiswa > 0 ? `1 : ${Math.round(stats.totalSiswa / Math.max(stats.totalGuru, 1))}` : '-'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-sm text-gray-600">Rata-rata Siswa per Kelas</span>
+                <span className="font-medium text-gray-900">
+                  {stats.totalKelas > 0 ? Math.round(stats.totalSiswa / stats.totalKelas) : 0}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="font-semibold text-gray-900 mb-4">Yang Perlu Diperhatikan</h2>
+            <div className="space-y-3">
+              {stats.totalGuru === 0 && (
+                <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
+                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span className="text-sm text-amber-800">Belum ada guru terdaftar</span>
+                </div>
+              )}
+              {stats.totalSiswa === 0 && (
+                <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
+                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span className="text-sm text-amber-800">Belum ada siswa terdaftar</span>
+                </div>
+              )}
+              {stats.totalKelas === 0 && (
+                <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
+                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span className="text-sm text-amber-800">Belum ada kelas dibuat</span>
+                </div>
+              )}
+              {stats.totalMataPelajaran === 0 && (
+                <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
+                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span className="text-sm text-amber-800">Belum ada mata pelajaran</span>
+                </div>
+              )}
+              {stats.totalGuru > 0 && stats.totalSiswa > 0 && stats.totalKelas > 0 && stats.totalMataPelajaran > 0 && (
+                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-sm text-green-800">Semua data sudah terisi dengan baik</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
