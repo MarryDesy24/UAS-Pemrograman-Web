@@ -22,8 +22,10 @@ export default function RegisterPage() {
     if (email && email.includes('@')) {
       if (isValidSchoolEmail(email)) {
         const detected = detectRoleFromEmail(email);
-        setRole(detected);
-        setDetectedRole(detected);
+        if (detected) {
+          setRole(detected);
+          setDetectedRole(detected);
+        }
         setEmailError('');
       } else {
         setEmailError('Email tidak valid. Gunakan email sekolah.');
