@@ -5,15 +5,32 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { signIn } from '@/lib/auth';
+import { SCHOOL_CONFIG, isValidSchoolEmail } from '@/lib/config';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+
+  const validateEmail = (value: string) => {
+    if (value && !isValidSchoolEmail(value) && value.includes('@')) {
+      setEmailError(`Hanya email ${SCHOOL_CONFIG.allowedDomain} yang diperbolehkan`);
+    } else {
+      setEmailError('');
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validasi email sekolah
+    if (!isValidSchoolEmail(email)) {
+      toast.error(`Hanya email ${SCHOOL_CONFIG.allowedDomain} yang diperbolehkan`);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -33,23 +50,29 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-indigo-900">FUSION</h1>
-            <p className="text-gray-500 mt-2">Masuk ke akun Anda</p>
+            <p className="text-gray-500 mt-2">{SCHOOL_CONFIG.schoolName}</p>
+            <p className="text-sm text-gray-400 mt-1">Masuk ke akun Anda</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+                Email Sekolah
               </label>
               <input
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                placeholder="email@sekolah.sch.id"
+                onChange={(e) => { setEmail(e.target.value); validateEmail(e.target.value); }}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${
+                  emailError ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
+                placeholder={`nama${SCHOOL_CONFIG.allowedDomain}`}
                 required
               />
+              {emailError && (
+                <p className="text-xs text-red-500 mt-1">{emailError}</p>
+              )}
             </div>
 
             <div>
@@ -62,7 +85,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                placeholder="••••••••"
+                placeholder="Masukkan password"
                 required
               />
             </div>
@@ -79,7 +102,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !!emailError}
               className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Masuk...' : 'Masuk'}

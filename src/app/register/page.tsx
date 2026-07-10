@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
+import { SCHOOL_CONFIG, isValidSchoolEmail, detectRoleFromEmail } from '@/lib/config';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -13,18 +14,37 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'guru' | 'siswa'>('siswa');
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [detectedRole, setDetectedRole] = useState<'guru' | 'siswa' | null>(null);
 
-  const detectRole = (emailValue: string) => {
-    const lower = emailValue.toLowerCase();
-    if (lower.includes('guru') || lower.includes('teacher') || lower.includes('dosen') || lower.includes('pak ') || lower.includes('bu ')) {
-      setRole('guru');
+  // Auto-detect role saat email berubah
+  useEffect(() => {
+    if (email && isValidSchoolEmail(email)) {
+      const detected = detectRoleFromEmail(email);
+      setRole(detected);
+      setDetectedRole(detected);
+      setEmailError('');
+    } else if (email && !email.includes('@')) {
+      setEmailError('');
+      setDetectedRole(null);
+    } else if (email && !isValidSchoolEmail(email)) {
+      setEmailError(`Hanya email ${SCHOOL_CONFIG.allowedDomain} yang diperbolehkan`);
+      setDetectedRole(null);
     } else {
-      setRole('siswa');
+      setEmailError('');
+      setDetectedRole(null);
     }
-  };
+  }, [email]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validasi email sekolah
+    if (!isValidSchoolEmail(email)) {
+      toast.error(`Hanya email ${SCHOOL_CONFIG.allowedDomain} yang diperbolehkan`);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -49,7 +69,7 @@ export default function RegisterPage() {
         });
       }
 
-      toast.success(`Akun ${role} berhasil dibuat!`);
+      toast.success(`Akun ${role} berhasil dibuat! Silakan cek email untuk verifikasi.`);
       router.push('/login');
     } catch (error: any) {
       toast.error(error.message || 'Gagal mendaftar');
@@ -64,7 +84,7 @@ export default function RegisterPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-indigo-900">FUSION</h1>
-            <p className="text-gray-500 mt-2">Daftar Akun Baru</p>
+            <p className="text-gray-500 mt-2">Daftar Akun {SCHOOL_CONFIG.schoolName}</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-5">
@@ -81,20 +101,35 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email Sekolah</label>
               <input
                 type="email"
                 value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  detectRole(e.target.value);
-                }}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                placeholder="contoh: budi@guru.sekolah.sch.id"
+                onChange={(e) => setEmail(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
+                  emailError ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
+                placeholder={`contoh: nama${SCHOOL_CONFIG.allowedDomain}`}
                 required
               />
+              {emailError && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {emailError}
+                </p>
+              )}
+              {detectedRole && !emailError && (
+                <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Terdeteksi sebagai: <strong className="capitalize">{detectedRole}</strong>
+                </p>
+              )}
               <p className="text-xs text-gray-400 mt-1">
-                Email mengandung &quot;guru&quot; → otomatis role Guru. Selain itu → Siswa.
+                Hanya email <strong>{SCHOOL_CONFIG.allowedDomain}</strong> yang diperbolehkan
               </p>
             </div>
 
@@ -125,6 +160,7 @@ export default function RegisterPage() {
                 >
                   <div className="text-2xl mb-1">👨‍🏫</div>
                   <div className="font-medium text-sm">Guru</div>
+                  <div className="text-xs text-gray-400 mt-1">guru.email@sekolah.sch.id</div>
                 </button>
                 <button
                   type="button"
@@ -137,14 +173,15 @@ export default function RegisterPage() {
                 >
                   <div className="text-2xl mb-1">🎓</div>
                   <div className="font-medium text-sm">Siswa</div>
+                  <div className="text-xs text-gray-400 mt-1">siswa.email@sekolah.sch.id</div>
                 </button>
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50"
+              disabled={loading || !!emailError}
+              className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Mendaftar...' : 'Daftar'}
             </button>
