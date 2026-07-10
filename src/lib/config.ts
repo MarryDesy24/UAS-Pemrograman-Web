@@ -10,7 +10,7 @@ export const SCHOOL_CONFIG = {
   },
 
   // Nama sekolah
-  schoolName: 'SMK',
+  schoolName: 'Learning Management System',
 };
 
 // Fungsi untuk validasi email sekolah
