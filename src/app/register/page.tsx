@@ -19,17 +19,16 @@ export default function RegisterPage() {
 
   // Auto-detect role saat email berubah
   useEffect(() => {
-    if (email && isValidSchoolEmail(email)) {
-      const detected = detectRoleFromEmail(email);
-      setRole(detected);
-      setDetectedRole(detected);
-      setEmailError('');
-    } else if (email && !email.includes('@')) {
-      setEmailError('');
-      setDetectedRole(null);
-    } else if (email && !isValidSchoolEmail(email)) {
-      setEmailError(`Hanya email ${SCHOOL_CONFIG.allowedDomain} yang diperbolehkan`);
-      setDetectedRole(null);
+    if (email && email.includes('@')) {
+      if (isValidSchoolEmail(email)) {
+        const detected = detectRoleFromEmail(email);
+        setRole(detected);
+        setDetectedRole(detected);
+        setEmailError('');
+      } else {
+        setEmailError('Email tidak valid. Gunakan email sekolah.');
+        setDetectedRole(null);
+      }
     } else {
       setEmailError('');
       setDetectedRole(null);
@@ -39,9 +38,8 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validasi email sekolah
     if (!isValidSchoolEmail(email)) {
-      toast.error(`Hanya email ${SCHOOL_CONFIG.allowedDomain} yang diperbolehkan`);
+      toast.error('Gunakan email sekolah yang valid');
       return;
     }
 
@@ -58,7 +56,6 @@ export default function RegisterPage() {
 
       if (error) throw error;
 
-      // Insert profile ke tabel users (fallback jika trigger belum jalan)
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await supabase.from('users').upsert({
@@ -69,7 +66,7 @@ export default function RegisterPage() {
         });
       }
 
-      toast.success(`Akun ${role} berhasil dibuat! Silakan cek email untuk verifikasi.`);
+      toast.success(`Akun ${role} berhasil dibuat!`);
       router.push('/login');
     } catch (error: any) {
       toast.error(error.message || 'Gagal mendaftar');
@@ -84,7 +81,7 @@ export default function RegisterPage() {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-indigo-900">FUSION</h1>
-            <p className="text-gray-500 mt-2">Daftar Akun {SCHOOL_CONFIG.schoolName}</p>
+            <p className="text-gray-500 mt-2">{SCHOOL_CONFIG.schoolName}</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-5">
@@ -109,7 +106,7 @@ export default function RegisterPage() {
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
                   emailError ? 'border-red-300 bg-red-50' : 'border-gray-300'
                 }`}
-                placeholder={`contoh: nama${SCHOOL_CONFIG.allowedDomain}`}
+                placeholder="nama@student.smk.id"
                 required
               />
               {emailError && (
@@ -125,12 +122,9 @@ export default function RegisterPage() {
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Terdeteksi sebagai: <strong className="capitalize">{detectedRole}</strong>
+                  Terdeteksi: <strong className="capitalize">{detectedRole}</strong>
                 </p>
               )}
-              <p className="text-xs text-gray-400 mt-1">
-                Hanya email <strong>{SCHOOL_CONFIG.allowedDomain}</strong> yang diperbolehkan
-              </p>
             </div>
 
             <div>
@@ -160,7 +154,7 @@ export default function RegisterPage() {
                 >
                   <div className="text-2xl mb-1">👨‍🏫</div>
                   <div className="font-medium text-sm">Guru</div>
-                  <div className="text-xs text-gray-400 mt-1">guru.email@sekolah.sch.id</div>
+                  <div className="text-xs text-gray-400 mt-1">@guru.smk.id</div>
                 </button>
                 <button
                   type="button"
@@ -173,7 +167,7 @@ export default function RegisterPage() {
                 >
                   <div className="text-2xl mb-1">🎓</div>
                   <div className="font-medium text-sm">Siswa</div>
-                  <div className="text-xs text-gray-400 mt-1">siswa.email@sekolah.sch.id</div>
+                  <div className="text-xs text-gray-400 mt-1">@student.smk.id</div>
                 </button>
               </div>
             </div>

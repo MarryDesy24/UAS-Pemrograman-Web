@@ -1,44 +1,43 @@
 // Konfigurasi Email Sekolah FUSION
-// Hanya email dengan domain ini yang diperbolehkan register
+// Siswa: xxx@student.smk.id
+// Guru: xxx@guru.smk.id
 
 export const SCHOOL_CONFIG = {
-  // Domain email yang diizinkan (ganti dengan domain sekolah kamu)
-  allowedDomain: '@smkbiak.sch.id',
-
-  // Pola email untuk auto-detect role
-  rolePatterns: {
-    guru: ['guru.', 'teacher.', 'dosen.', 'admin.'],
-    siswa: ['siswa.', 'student.', 'nisn.'],
+  // Domain email yang diizinkan
+  allowedDomains: {
+    guru: '@guru.smk.id',
+    siswa: '@student.smk.id',
   },
 
   // Nama sekolah
-  schoolName: 'SMK Biak',
+  schoolName: 'SMK',
 };
 
 // Fungsi untuk validasi email sekolah
 export function isValidSchoolEmail(email: string): boolean {
-  return email.toLowerCase().endsWith(SCHOOL_CONFIG.allowedDomain);
+  const lower = email.toLowerCase();
+  return (
+    lower.endsWith(SCHOOL_CONFIG.allowedDomains.guru) ||
+    lower.endsWith(SCHOOL_CONFIG.allowedDomains.siswa)
+  );
 }
 
 // Fungsi untuk auto-detect role dari email
 export function detectRoleFromEmail(email: string): 'guru' | 'siswa' | null {
   const lower = email.toLowerCase();
-  const localPart = lower.split('@')[0]; // bagian sebelum @
 
-  // Cek pola guru
-  for (const pattern of SCHOOL_CONFIG.rolePatterns.guru) {
-    if (localPart.startsWith(pattern) || localPart.includes(pattern)) {
-      return 'guru';
-    }
+  if (lower.endsWith(SCHOOL_CONFIG.allowedDomains.guru)) {
+    return 'guru';
   }
 
-  // Cek pola siswa
-  for (const pattern of SCHOOL_CONFIG.rolePatterns.siswa) {
-    if (localPart.startsWith(pattern) || localPart.includes(pattern)) {
-      return 'siswa';
-    }
+  if (lower.endsWith(SCHOOL_CONFIG.allowedDomains.siswa)) {
+    return 'siswa';
   }
 
-  // Default: siswa (karena jumlah siswa lebih banyak)
-  return 'siswa';
+  return null;
+}
+
+// Fungsi untuk mendapatkan domain dari role
+export function getDomainByRole(role: 'guru' | 'siswa'): string {
+  return SCHOOL_CONFIG.allowedDomains[role];
 }

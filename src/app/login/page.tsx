@@ -15,8 +15,8 @@ export default function LoginPage() {
   const [emailError, setEmailError] = useState('');
 
   const validateEmail = (value: string) => {
-    if (value && !isValidSchoolEmail(value) && value.includes('@')) {
-      setEmailError(`Hanya email ${SCHOOL_CONFIG.allowedDomain} yang diperbolehkan`);
+    if (value && value.includes('@') && !isValidSchoolEmail(value)) {
+      setEmailError('Email tidak valid. Gunakan email sekolah.');
     } else {
       setEmailError('');
     }
@@ -25,9 +25,8 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validasi email sekolah
     if (!isValidSchoolEmail(email)) {
-      toast.error(`Hanya email ${SCHOOL_CONFIG.allowedDomain} yang diperbolehkan`);
+      toast.error('Gunakan email sekolah yang valid');
       return;
     }
 
@@ -67,12 +66,15 @@ export default function LoginPage() {
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all ${
                   emailError ? 'border-red-300 bg-red-50' : 'border-gray-300'
                 }`}
-                placeholder={`nama${SCHOOL_CONFIG.allowedDomain}`}
+                placeholder="nama@student.smk.id"
                 required
               />
               {emailError && (
                 <p className="text-xs text-red-500 mt-1">{emailError}</p>
               )}
+              <p className="text-xs text-gray-400 mt-1">
+                Siswa: <strong>@student.smk.id</strong> | Guru: <strong>@guru.smk.id</strong>
+              </p>
             </div>
 
             <div>
