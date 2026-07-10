@@ -128,36 +128,6 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Daftar Sebagai</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => { setRole('guru'); setEmailDomain('guru.smk.id'); }}
-                  className={`p-4 rounded-lg border-2 transition-all text-center ${
-                    role === 'guru'
-                      ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                      : 'border-gray-200 text-gray-500 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="text-2xl mb-1">👨‍🏫</div>
-                  <div className="font-medium text-sm">Guru</div>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setRole('siswa'); setEmailDomain('student.smk.id'); }}
-                  className={`p-4 rounded-lg border-2 transition-all text-center ${
-                    role === 'siswa'
-                      ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                      : 'border-gray-200 text-gray-500 hover:border-gray-300'
-                  }`}
-                >
-                  <div className="text-2xl mb-1">🎓</div>
-                  <div className="font-medium text-sm">Siswa</div>
-                </button>
-              </div>
-            </div>
-
             <button
               type="submit"
               disabled={loading || !emailLocal.trim()}
