@@ -184,39 +184,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Custom 3D Animations */}
-      <style jsx>{`
-        @keyframes logoFloat {
-          0%, 100% {
-            transform: translateY(0px) translateZ(0px);
-          }
-          50% {
-            transform: translateY(-15px) translateZ(10px);
-          }
-        }
-
-        @keyframes logoRotate {
-          0% {
-            transform: rotateY(0deg);
-          }
-          100% {
-            transform: rotateY(360deg);
-          }
-        }
-
-        @keyframes textGlow {
-          0% {
-            text-shadow: 0 0 40px rgba(59, 130, 246, 0.5), 0 0 80px rgba(59, 130, 246, 0.3), 0 4px 0 #1e40af;
-          }
-          100% {
-            text-shadow: 0 0 60px rgba(59, 130, 246, 0.8), 0 0 120px rgba(59, 130, 246, 0.5), 0 4px 0 #1e40af;
-          }
-        }
-
-        .glass-card-hover:hover {
-          transform: rotateX(0deg) rotateY(0deg) translateZ(10px) !important;
-        }
-      `}</style>
     </main>
   );
 }

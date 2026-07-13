@@ -165,3 +165,47 @@ body {
   background: rgba(59, 130, 246, 0.4);
   color: white;
 }
+
+/* 3D Animations */
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0px) translateZ(0px);
+  }
+  50% {
+    transform: translateY(-15px) translateZ(10px);
+  }
+}
+
+@keyframes logoRotate {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+@keyframes textGlow {
+  0% {
+    text-shadow: 0 0 40px rgba(59, 130, 246, 0.5), 0 0 80px rgba(59, 130, 246, 0.3), 0 4px 0 #1e40af;
+  }
+  100% {
+    text-shadow: 0 0 60px rgba(59, 130, 246, 0.8), 0 0 120px rgba(59, 130, 246, 0.5), 0 4px 0 #1e40af;
+  }
+}
+
+.animate-logo-float {
+  animation: logoFloat 6s ease-in-out infinite;
+}
+
+.animate-logo-rotate {
+  animation: logoRotate 20s linear infinite;
+}
+
+.animate-text-glow {
+  animation: textGlow 3s ease-in-out infinite alternate;
+}
+
+.glass-card-3d:hover {
+  transform: rotateX(0deg) rotateY(0deg) translateZ(10px) !important;
+}
