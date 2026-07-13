@@ -56,6 +56,52 @@
 
 ---
 
+# Sprint 8 — Revisi UI/UX Design ✅ SELESAI
+
+**Status:** SELESAI
+
+**Referensi Desain:** https://itfest.ub.ac.id/home
+
+### Perubahan yang Dilakukan:
+
+1. **Dark Theme** — Seluruh halaman diubah ke background gelap (`bg-dark-900`)
+2. **Glassmorphism** — Cards, input, sidebar, header menggunakan efek kaca transparan dengan backdrop-blur
+3. **Typography** — Tambah font League Spartan untuk headings, Inter untuk body text
+4. **Gradient Mesh Background** — Background dengan radial gradient multi-warna
+5. **3D Animations** — Logo FUSION 3D rotating, floating particles, text glow effect
+6. **Component Updates:**
+   - **Sidebar** — Glass panel dengan gradient avatar dan active indicator
+   - **Header** — Glass header dengan dropdown transparan
+   - **Login/Register** — Glassmorphism card dengan floating decorations
+   - **Dashboard** — Semua stat cards menggunakan glass-card style
+   - **Modal** — Backdrop blur overlay dengan glass modal
+7. **Custom Utilities:**
+   - `.glass`, `.glass-strong`, `.glass-card`, `.glass-card-hover`
+   - `.glass-input` untuk form inputs
+   - `.btn-primary`, `.btn-secondary`, `.btn-danger` dengan gradient
+   - `.text-gradient` untuk teks gradient
+   - Animations: `logoFloat`, `logoRotate`, `textGlow`
+
+### File yang Diupdate:
+
+| File | Perubahan |
+|------|-----------|
+| `tailwind.config.ts` | Dark colors, font family, animations, shadows |
+| `globals.css` | Glassmorphism utilities, 3D animations, custom scrollbar |
+| `layout.tsx` | Dark background, toast styling |
+| `page.tsx` | Landing page dengan animasi 3D |
+| `Sidebar.tsx` | Dark glass sidebar |
+| `Header.tsx` | Dark glass header |
+| `login/page.tsx` | Glassmorphism login |
+| `register/page.tsx` | Glassmorphism register |
+| `forgot-password/page.tsx` | Glassmorphism reset |
+| `admin/register/page.tsx` | Glassmorphism admin register |
+| `dashboard/page.tsx` | Dark dashboard dengan glass cards |
+| `dashboard/ganti-password/page.tsx` | Glassmorphism form |
+| Semua halaman dashboard lainnya | Dark theme + glassmorphism |
+
+---
+
 # Ringkasan Project FUSION
 
 ## Tech Stack
