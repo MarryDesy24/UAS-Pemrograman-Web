@@ -26,32 +26,39 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+    <main className="min-h-screen flex items-center justify-center bg-dark-900 bg-mesh px-4 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-20 right-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+
+      <div className="w-full max-w-md relative z-10 animate-slide-up">
+        <div className="glass-card">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-indigo-900">FUSION</h1>
-            <p className="text-gray-500 mt-2">Reset Password</p>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-glow mb-4">
+              <span className="text-white font-heading font-bold text-2xl">F</span>
+            </div>
+            <h1 className="text-3xl font-heading font-bold text-white">FUSION</h1>
+            <p className="text-dark-400 mt-2">Reset Password</p>
           </div>
 
           {sent ? (
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20">
+                <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-gray-600">
-                Link reset password telah dikirim ke <strong>{email}</strong>
+              <p className="text-dark-300">
+                Link reset password telah dikirim ke <strong className="text-white">{email}</strong>
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-dark-400">
                 Silakan cek email Anda dan ikuti instruksi yang diberikan.
               </p>
             </div>
           ) : (
             <form onSubmit={handleReset} className="space-y-6">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-dark-300 mb-2">
                   Email
                 </label>
                 <input
@@ -59,7 +66,7 @@ export default function ForgotPasswordPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                  className="glass-input"
                   placeholder="email@sekolah.sch.id"
                   required
                 />
@@ -68,15 +75,15 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary w-full"
               >
                 {loading ? 'Mengirim...' : 'Kirim Link Reset'}
               </button>
             </form>
           )}
 
-          <div className="mt-6 text-center">
-            <Link href="/login" className="text-sm text-indigo-600 hover:text-indigo-800">
+          <div className="mt-8 text-center">
+            <Link href="/login" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
               Kembali ke login
             </Link>
           </div>

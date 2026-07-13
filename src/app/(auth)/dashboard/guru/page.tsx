@@ -116,14 +116,14 @@ export default function GuruPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Manajemen Guru</h1>
+        <h1 className="text-2xl font-bold text-white">Manajemen Guru</h1>
         <button
           onClick={() => {
             setEditingGuru(null);
             setFormData({ nama: '', email: '', password: '' });
             setShowModal(true);
           }}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
         >
           + Tambah Guru
         </button>
@@ -131,29 +131,29 @@ export default function GuruPage() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass-card overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-white/5 border-b border-white/10">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">No</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Nama</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Email</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {guru.map((g, index) => (
-                <tr key={g.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{g.nama}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{g.email}</td>
+                <tr key={g.id} className="hover:bg-white/5">
+                  <td className="px-6 py-4 text-sm text-white">{index + 1}</td>
+                  <td className="px-6 py-4 text-sm text-white">{g.nama}</td>
+                  <td className="px-6 py-4 text-sm text-dark-400">{g.email}</td>
                   <td className="px-6 py-4 text-sm space-x-2">
                     <button
                       onClick={() => handleEdit(g)}
-                      className="text-indigo-600 hover:text-indigo-800"
+                      className="text-blue-400 hover:text-blue-300"
                     >
                       Edit
                     </button>
@@ -176,46 +176,46 @@ export default function GuruPage() {
             </tbody>
           </table>
           {guru.length === 0 && (
-            <div className="text-center py-12 text-gray-500">Belum ada data guru</div>
+            <div className="text-center py-12 text-dark-400">Belum ada data guru</div>
           )}
         </div>
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="glass-card w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">
               {editingGuru ? 'Edit Guru' : 'Tambah Guru'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nama</label>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Nama</label>
                 <input
                   type="text"
                   value={formData.nama}
                   onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Email</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   required
                 />
               </div>
               {!editingGuru && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                  <label className="block text-sm font-medium text-dark-300 mb-1">Password</label>
                   <input
                     type="password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                     required
                   />
                 </div>
@@ -224,13 +224,13 @@ export default function GuruPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                  className="px-4 py-2 text-dark-300 hover:bg-white/10 rounded-lg"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                 >
                   {editingGuru ? 'Update' : 'Simpan'}
                 </button>

@@ -106,7 +106,6 @@ export default function DashboardPage() {
           const classroomIds = memberData?.map(m => m.classroom_id) || [];
 
           if (classroomIds.length > 0) {
-            // Pengumuman
             const { data: announcements } = await supabase
               .from('announcements')
               .select('*')
@@ -115,7 +114,6 @@ export default function DashboardPage() {
               .limit(3);
             setRecentAnnouncements(announcements || []);
 
-            // Deadline tugas mendatang
             const { data: classrooms } = await supabase
               .from('classrooms')
               .select('id, nama')
@@ -146,7 +144,6 @@ export default function DashboardPage() {
               setDeadlines(upcoming);
             }
 
-            // Nilai terbaru
             const { data: recentSubs } = await supabase
               .from('submissions')
               .select('*')
@@ -185,7 +182,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -195,177 +192,177 @@ export default function DashboardPage() {
   // ============================================
   if (user?.role === 'admin') {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin</h1>
-            <p className="text-sm text-gray-500">Kelola seluruh data sekolah</p>
+            <h1 className="text-2xl font-heading font-bold text-white">Dashboard Admin</h1>
+            <p className="text-sm text-dark-400">Kelola seluruh data sekolah</p>
           </div>
         </div>
 
         {/* Statistik Utama */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Link href="/dashboard/guru" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <Link href="/dashboard/guru" className="glass-card-hover group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total Guru</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalGuru}</p>
+                <p className="text-sm text-dark-400">Total Guru</p>
+                <p className="text-2xl font-bold text-white">{stats.totalGuru}</p>
               </div>
             </div>
           </Link>
 
-          <Link href="/dashboard/siswa" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <Link href="/dashboard/siswa" className="glass-card-hover group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total Siswa</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalSiswa}</p>
+                <p className="text-sm text-dark-400">Total Siswa</p>
+                <p className="text-2xl font-bold text-white">{stats.totalSiswa}</p>
               </div>
             </div>
           </Link>
 
-          <Link href="/dashboard/kelas" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <Link href="/dashboard/kelas" className="glass-card-hover group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+                <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total Kelas</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalKelas}</p>
+                <p className="text-sm text-dark-400">Total Kelas</p>
+                <p className="text-2xl font-bold text-white">{stats.totalKelas}</p>
               </div>
             </div>
           </Link>
 
-          <Link href="/dashboard/mata-pelajaran" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <Link href="/dashboard/mata-pelajaran" className="glass-card-hover group">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center group-hover:bg-orange-500/30 transition-colors">
+                <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Mata Pelajaran</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalMataPelajaran}</p>
+                <p className="text-sm text-dark-400">Mata Pelajaran</p>
+                <p className="text-2xl font-bold text-white">{stats.totalMataPelajaran}</p>
               </div>
             </div>
           </Link>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="font-semibold text-gray-900 mb-4">Aksi Cepat</h2>
+        <div className="glass-card">
+          <h2 className="font-heading font-semibold text-white mb-4">Aksi Cepat</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link href="/dashboard/guru" className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <Link href="/dashboard/guru" className="flex items-center gap-3 p-4 glass rounded-xl hover:bg-white/10 transition-all duration-300 group">
+              <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
+                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
-              <span className="text-sm font-medium text-gray-700">Tambah Guru</span>
+              <span className="text-sm font-medium text-dark-300 group-hover:text-white transition-colors">Tambah Guru</span>
             </Link>
-            <Link href="/dashboard/siswa" className="flex items-center gap-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <Link href="/dashboard/siswa" className="flex items-center gap-3 p-4 glass rounded-xl hover:bg-white/10 transition-all duration-300 group">
+              <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
-              <span className="text-sm font-medium text-gray-700">Tambah Siswa</span>
+              <span className="text-sm font-medium text-dark-300 group-hover:text-white transition-colors">Tambah Siswa</span>
             </Link>
-            <Link href="/dashboard/kelas" className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <Link href="/dashboard/kelas" className="flex items-center gap-3 p-4 glass rounded-xl hover:bg-white/10 transition-all duration-300 group">
+              <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+                <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
-              <span className="text-sm font-medium text-gray-700">Buat Kelas</span>
+              <span className="text-sm font-medium text-dark-300 group-hover:text-white transition-colors">Buat Kelas</span>
             </Link>
-            <Link href="/dashboard/mata-pelajaran" className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <Link href="/dashboard/mata-pelajaran" className="flex items-center gap-3 p-4 glass rounded-xl hover:bg-white/10 transition-all duration-300 group">
+              <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center group-hover:bg-orange-500/30 transition-colors">
+                <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </div>
-              <span className="text-sm font-medium text-gray-700">Tambah Mata Pelajaran</span>
+              <span className="text-sm font-medium text-dark-300 group-hover:text-white transition-colors">Tambah Mata Pelajaran</span>
             </Link>
           </div>
         </div>
 
         {/* Info Ringkas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="font-semibold text-gray-900 mb-4">Ringkasan Sistem</h2>
+          <div className="glass-card">
+            <h2 className="font-heading font-semibold text-white mb-4">Ringkasan Sistem</h2>
             <div className="space-y-3">
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">Total Pengguna</span>
-                <span className="font-medium text-gray-900">{stats.totalGuru + stats.totalSiswa + 1}</span>
+              <div className="flex items-center justify-between py-3 border-b border-white/10">
+                <span className="text-sm text-dark-400">Total Pengguna</span>
+                <span className="font-medium text-white">{stats.totalGuru + stats.totalSiswa + 1}</span>
               </div>
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <span className="text-sm text-gray-600">Rasio Guru : Siswa</span>
-                <span className="font-medium text-gray-900">
+              <div className="flex items-center justify-between py-3 border-b border-white/10">
+                <span className="text-sm text-dark-400">Rasio Guru : Siswa</span>
+                <span className="font-medium text-white">
                   {stats.totalSiswa > 0 ? `1 : ${Math.round(stats.totalSiswa / Math.max(stats.totalGuru, 1))}` : '-'}
                 </span>
               </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-sm text-gray-600">Rata-rata Siswa per Kelas</span>
-                <span className="font-medium text-gray-900">
+              <div className="flex items-center justify-between py-3">
+                <span className="text-sm text-dark-400">Rata-rata Siswa per Kelas</span>
+                <span className="font-medium text-white">
                   {stats.totalKelas > 0 ? Math.round(stats.totalSiswa / stats.totalKelas) : 0}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="font-semibold text-gray-900 mb-4">Yang Perlu Diperhatikan</h2>
+          <div className="glass-card">
+            <h2 className="font-heading font-semibold text-white mb-4">Yang Perlu Diperhatikan</h2>
             <div className="space-y-3">
               {stats.totalGuru === 0 && (
-                <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
-                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-3 p-3 glass rounded-xl">
+                  <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  <span className="text-sm text-amber-800">Belum ada guru terdaftar</span>
+                  <span className="text-sm text-amber-300">Belum ada guru terdaftar</span>
                 </div>
               )}
               {stats.totalSiswa === 0 && (
-                <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
-                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-3 p-3 glass rounded-xl">
+                  <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  <span className="text-sm text-amber-800">Belum ada siswa terdaftar</span>
+                  <span className="text-sm text-amber-300">Belum ada siswa terdaftar</span>
                 </div>
               )}
               {stats.totalKelas === 0 && (
-                <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
-                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-3 p-3 glass rounded-xl">
+                  <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  <span className="text-sm text-amber-800">Belum ada kelas dibuat</span>
+                  <span className="text-sm text-amber-300">Belum ada kelas dibuat</span>
                 </div>
               )}
               {stats.totalMataPelajaran === 0 && (
-                <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg">
-                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-3 p-3 glass rounded-xl">
+                  <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  <span className="text-sm text-amber-800">Belum ada mata pelajaran</span>
+                  <span className="text-sm text-amber-300">Belum ada mata pelajaran</span>
                 </div>
               )}
               {stats.totalGuru > 0 && stats.totalSiswa > 0 && stats.totalKelas > 0 && stats.totalMataPelajaran > 0 && (
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-3 p-3 glass rounded-xl">
+                  <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-sm text-green-800">Semua data sudah terisi dengan baik</span>
+                  <span className="text-sm text-green-300">Semua data sudah terisi dengan baik</span>
                 </div>
               )}
             </div>
@@ -380,58 +377,58 @@ export default function DashboardPage() {
   // ============================================
   if (user?.role === 'guru') {
     return (
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard Guru</h1>
+      <div className="space-y-6 animate-fade-in">
+        <h1 className="text-2xl font-heading font-bold text-white">Dashboard Guru</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div className="glass-card">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Kelas Diampu</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalGuru}</p>
+                <p className="text-sm text-dark-400">Kelas Diampu</p>
+                <p className="text-2xl font-bold text-white">{stats.totalGuru}</p>
               </div>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div className="glass-card">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Modul Ajar</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalSiswa}</p>
+                <p className="text-sm text-dark-400">Modul Ajar</p>
+                <p className="text-2xl font-bold text-white">{stats.totalSiswa}</p>
               </div>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div className="glass-card">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total Assessment</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalAssessment}</p>
+                <p className="text-sm text-dark-400">Total Assessment</p>
+                <p className="text-2xl font-bold text-white">{stats.totalAssessment}</p>
               </div>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div className="glass-card">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
+                <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Belum Dinilai</p>
-                <p className={`text-2xl font-bold ${stats.assessmentBelumDinilai > 0 ? 'text-amber-600' : 'text-gray-900'}`}>
+                <p className="text-sm text-dark-400">Belum Dinilai</p>
+                <p className={`text-2xl font-bold ${stats.assessmentBelumDinilai > 0 ? 'text-amber-400' : 'text-white'}`}>
                   {stats.assessmentBelumDinilai}
                 </p>
               </div>
@@ -440,16 +437,16 @@ export default function DashboardPage() {
         </div>
 
         {stats.assessmentBelumDinilai > 0 && (
-          <Link href="/dashboard/penilaian" className="block bg-amber-50 border border-amber-200 rounded-xl p-4 hover:bg-amber-100 transition-colors">
+          <Link href="/dashboard/penilaian" className="block glass-card border-amber-500/30 hover:bg-amber-500/10 transition-all duration-300">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-amber-800">Ada {stats.assessmentBelumDinilai} submission yang belum dinilai</p>
-                <p className="text-sm text-amber-600">Klik untuk menuju halaman penilaian</p>
+                <p className="font-medium text-amber-300">Ada {stats.assessmentBelumDinilai} submission yang belum dinilai</p>
+                <p className="text-sm text-amber-400/70">Klik untuk menuju halaman penilaian</p>
               </div>
             </div>
           </Link>
@@ -463,21 +460,21 @@ export default function DashboardPage() {
   // ============================================
   if (user?.role === 'siswa') {
     return (
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard Siswa</h1>
+      <div className="space-y-6 animate-fade-in">
+        <h1 className="text-2xl font-heading font-bold text-white">Dashboard Siswa</h1>
 
         {/* Deadline Tugas */}
         {deadlines.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-            <h2 className="font-semibold text-gray-900 mb-3">Deadline Mendatang</h2>
+          <div className="glass-card">
+            <h2 className="font-heading font-semibold text-white mb-4">Deadline Mendatang</h2>
             <div className="space-y-3">
               {deadlines.map((d) => (
-                <div key={d.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={d.id} className="flex items-center justify-between p-4 glass rounded-xl">
                   <div>
-                    <h3 className="font-medium text-gray-900">{d.title}</h3>
-                    <p className="text-xs text-gray-500">{d.classroom_nama} - {d.type}</p>
+                    <h3 className="font-medium text-white">{d.title}</h3>
+                    <p className="text-xs text-dark-400">{d.classroom_nama} - {d.type}</p>
                   </div>
-                  <span className="text-sm font-medium text-amber-600">
+                  <span className="text-sm font-medium text-amber-400">
                     {new Date(d.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
@@ -488,23 +485,23 @@ export default function DashboardPage() {
 
         {/* Nilai Terbaru */}
         {recentNilai.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-            <h2 className="font-semibold text-gray-900 mb-3">Nilai Terbaru</h2>
+          <div className="glass-card">
+            <h2 className="font-heading font-semibold text-white mb-4">Nilai Terbaru</h2>
             <div className="space-y-3">
               {recentNilai.map((n) => (
-                <div key={n.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={n.id} className="flex items-center justify-between p-4 glass rounded-xl">
                   <div>
-                    <h3 className="font-medium text-gray-900">{n.assessment_title}</h3>
-                    <p className="text-xs text-gray-500">
+                    <h3 className="font-medium text-white">{n.assessment_title}</h3>
+                    <p className="text-xs text-dark-400">
                       {new Date(n.submitted_at).toLocaleDateString('id-ID')}
                     </p>
                   </div>
                   {n.score !== null ? (
-                    <span className={`text-lg font-bold ${((n.score / n.max_score) * 100) >= 80 ? 'text-green-600' : ((n.score / n.max_score) * 100) >= 60 ? 'text-amber-600' : 'text-red-600'}`}>
-                      {n.score}<span className="text-sm font-normal text-gray-500">/{n.max_score}</span>
+                    <span className={`text-lg font-bold ${((n.score / n.max_score) * 100) >= 80 ? 'text-green-400' : ((n.score / n.max_score) * 100) >= 60 ? 'text-amber-400' : 'text-red-400'}`}>
+                      {n.score}<span className="text-sm font-normal text-dark-400">/{n.max_score}</span>
                     </span>
                   ) : (
-                    <span className="text-sm text-gray-400">Belum dinilai</span>
+                    <span className="text-sm text-dark-500">Belum dinilai</span>
                   )}
                 </div>
               ))}
@@ -514,13 +511,13 @@ export default function DashboardPage() {
 
         {/* Pengumuman */}
         {recentAnnouncements.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-            <h2 className="font-semibold text-gray-900 mb-3">Pengumuman Terbaru</h2>
+          <div className="glass-card">
+            <h2 className="font-heading font-semibold text-white mb-4">Pengumuman Terbaru</h2>
             <div className="space-y-3">
               {recentAnnouncements.map((a) => (
-                <div key={a.id} className="p-3 bg-gray-50 rounded-lg">
-                  <h3 className="font-medium text-gray-900">{a.title}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{a.content}</p>
+                <div key={a.id} className="p-4 glass rounded-xl">
+                  <h3 className="font-medium text-white">{a.title}</h3>
+                  <p className="text-sm text-dark-300 mt-1">{a.content}</p>
                 </div>
               ))}
             </div>
@@ -528,9 +525,14 @@ export default function DashboardPage() {
         )}
 
         {deadlines.length === 0 && recentNilai.length === 0 && recentAnnouncements.length === 0 && (
-          <div className="text-center py-12 text-gray-500 bg-white rounded-xl border border-gray-100">
-            <p className="text-lg font-medium text-gray-600 mb-1">Selamat belajar!</p>
-            <p className="text-sm text-gray-400">Belum ada data yang ditampilkan</p>
+          <div className="text-center py-16 glass-card">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/20 mb-4">
+              <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <p className="text-lg font-medium text-white mb-1">Selamat belajar!</p>
+            <p className="text-sm text-dark-400">Belum ada data yang ditampilkan</p>
           </div>
         )}
       </div>

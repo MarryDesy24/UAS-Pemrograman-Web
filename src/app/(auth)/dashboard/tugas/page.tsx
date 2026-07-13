@@ -94,30 +94,30 @@ export default function TugasPage() {
       'lkpd': 'bg-yellow-100 text-yellow-700',
       'tugas': 'bg-orange-100 text-orange-700',
     };
-    return colors[type] || 'bg-gray-100 text-gray-700';
+    return colors[type] || 'bg-gray-100 text-dark-300';
   };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Tugas Saya</h1>
+      <h1 className="text-2xl font-bold text-white">Tugas Saya</h1>
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
         </div>
       ) : (
         <div className="space-y-4">
           {assessments.map((a) => (
-            <div key={a.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+            <div key={a.id} className="glass-card">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeBadge(a.type)}`}>{a.type}</span>
-                    <span className="text-xs text-gray-500">{a.classroom_nama}</span>
+                    <span className="text-xs text-dark-400">{a.classroom_nama}</span>
                   </div>
-                  <h3 className="mt-2 font-semibold text-gray-900">{a.title}</h3>
-                  <p className="text-sm text-gray-500 mt-1">{a.description}</p>
-                  <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                  <h3 className="mt-2 font-semibold text-white">{a.title}</h3>
+                  <p className="text-sm text-dark-400 mt-1">{a.description}</p>
+                  <div className="flex items-center gap-4 mt-3 text-sm text-dark-400">
                     <span>Max: {a.max_score} poin</span>
                     {a.deadline && (
                       <span className={isPastDeadline(a.deadline) && !a.submission ? 'text-red-600 font-medium' : ''}>
@@ -135,12 +135,12 @@ export default function TugasPage() {
                       </span>
                       {a.submission.score !== null && a.submission.score !== undefined && (
                         <div className="mt-2">
-                          <span className="text-sm text-gray-500">Nilai: </span>
-                          <span className="text-lg font-bold text-indigo-600">{a.submission.score}</span>
+                          <span className="text-sm text-dark-400">Nilai: </span>
+                          <span className="text-lg font-bold text-blue-400">{a.submission.score}</span>
                         </div>
                       )}
                       {a.submission.feedback && (
-                        <p className="text-xs text-gray-500 mt-1 max-w-xs">{a.submission.feedback}</p>
+                        <p className="text-xs text-dark-400 mt-1 max-w-xs">{a.submission.feedback}</p>
                       )}
                     </div>
                   ) : (
@@ -155,7 +155,7 @@ export default function TugasPage() {
                             if (file) handleSubmit(a.id, file);
                           }}
                         />
-                        <span className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm">
+                        <span className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
                           {uploading === a.id ? 'Mengupload...' : 'Kumpulkan'}
                         </span>
                       </label>
@@ -170,7 +170,7 @@ export default function TugasPage() {
             </div>
           ))}
           {assessments.length === 0 && (
-            <div className="text-center py-12 text-gray-500 bg-white rounded-xl border border-gray-100">Belum ada tugas</div>
+            <div className="text-center py-12 text-dark-400 glass-card">Belum ada tugas</div>
           )}
         </div>
       )}

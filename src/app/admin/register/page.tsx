@@ -13,7 +13,6 @@ export default function AdminRegisterPage() {
   const [secretKey, setSecretKey] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Kode rahasia untuk register admin (ganti sesuai kebutuhan)
   const VALID_SECRET_KEY = 'FUSION-ADMIN-2024';
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -57,47 +56,53 @@ export default function AdminRegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+    <main className="min-h-screen flex items-center justify-center bg-dark-900 bg-mesh px-4 relative overflow-hidden">
+      <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+
+      <div className="w-full max-w-md relative z-10 animate-slide-up">
+        <div className="glass-card">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">FUSION</h1>
-            <p className="text-gray-500 mt-2">Admin Registration</p>
-            <p className="text-xs text-gray-400 mt-1">Halaman ini tidak dipublikasikan</p>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-glow mb-4">
+              <span className="text-white font-heading font-bold text-2xl">F</span>
+            </div>
+            <h1 className="text-3xl font-heading font-bold text-white">FUSION</h1>
+            <p className="text-dark-400 mt-2">Admin Registration</p>
+            <p className="text-xs text-dark-500 mt-1">Halaman ini tidak dipublikasikan</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+              <label className="block text-sm font-medium text-dark-300 mb-2">Nama Lengkap</label>
               <input
                 type="text"
                 value={nama}
                 onChange={(e) => setNama(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="glass-input"
                 placeholder="Masukkan nama lengkap"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email Admin</label>
+              <label className="block text-sm font-medium text-dark-300 mb-2">Email Admin</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="glass-input"
                 placeholder="admin@sekolah.sch.id"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label className="block text-sm font-medium text-dark-300 mb-2">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="glass-input"
                 placeholder="Minimal 6 karakter"
                 minLength={6}
                 required
@@ -105,29 +110,29 @@ export default function AdminRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Kode Rahasia</label>
+              <label className="block text-sm font-medium text-dark-300 mb-2">Kode Rahasia</label>
               <input
                 type="password"
                 value={secretKey}
                 onChange={(e) => setSecretKey(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="glass-input"
                 placeholder="Masukkan kode rahasia admin"
                 required
               />
-              <p className="text-xs text-gray-400 mt-1">Hubungi developer untuk mendapatkan kode</p>
+              <p className="text-xs text-dark-500 mt-2">Hubungi developer untuk mendapatkan kode</p>
             </div>
 
             <button
               type="submit"
               disabled={loading || !secretKey}
-              className="w-full py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full"
             >
               {loading ? 'Mendaftar...' : 'Daftar sebagai Admin'}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <a href="/login" className="text-sm text-gray-500 hover:text-gray-700">
+          <div className="mt-8 text-center">
+            <a href="/login" className="text-sm text-dark-400 hover:text-dark-300 transition-colors">
               Kembali ke login
             </a>
           </div>

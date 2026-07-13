@@ -36,19 +36,19 @@ export default function GantiPasswordPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Ganti Password</h1>
-        <p className="text-sm text-gray-500 mb-6">Masukkan password baru Anda</p>
+    <div className="max-w-md mx-auto animate-fade-in">
+      <div className="glass-card">
+        <h1 className="text-2xl font-heading font-bold text-white mb-2">Ganti Password</h1>
+        <p className="text-sm text-dark-400 mb-6">Masukkan password baru Anda</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
+            <label className="block text-sm font-medium text-dark-300 mb-2">Password Baru</label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+              className="glass-input"
               placeholder="Minimal 6 karakter"
               required
               minLength={6}
@@ -56,12 +56,12 @@ export default function GantiPasswordPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru</label>
+            <label className="block text-sm font-medium text-dark-300 mb-2">Konfirmasi Password Baru</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+              className="glass-input"
               placeholder="Ulangi password baru"
               required
               minLength={6}
@@ -71,7 +71,7 @@ export default function GantiPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-primary w-full"
           >
             {loading ? 'Mengubah...' : 'Ubah Password'}
           </button>

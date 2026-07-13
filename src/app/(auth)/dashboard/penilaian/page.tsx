@@ -95,36 +95,36 @@ export default function PenilaianPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Penilaian</h1>
+      <h1 className="text-2xl font-bold text-white">Penilaian</h1>
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass-card overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-white/5 border-b border-white/10">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Siswa</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assessment</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">File</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Siswa</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Assessment</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">File</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Tanggal</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {submissions.map((sub) => (
-                <tr key={sub.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{sub.student_nama}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{sub.assessment_title}</td>
+                <tr key={sub.id} className="hover:bg-white/5">
+                  <td className="px-6 py-4 text-sm font-medium text-white">{sub.student_nama}</td>
+                  <td className="px-6 py-4 text-sm text-dark-400">{sub.assessment_title}</td>
                   <td className="px-6 py-4 text-sm">
                     {sub.file_url ? (
-                      <a href={sub.file_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800">Lihat File</a>
+                      <a href={sub.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Lihat File</a>
                     ) : '-'}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-dark-400">
                     {new Date(sub.submitted_at).toLocaleDateString('id-ID')}
                   </td>
                   <td className="px-6 py-4">
@@ -137,7 +137,7 @@ export default function PenilaianPage() {
                   <td className="px-6 py-4 text-sm">
                     <button
                       onClick={() => openGradeModal(sub)}
-                      className="text-indigo-600 hover:text-indigo-800"
+                      className="text-blue-400 hover:text-blue-300"
                     >
                       {sub.score !== null && sub.score !== undefined ? 'Edit Nilai' : 'Beri Nilai'}
                     </button>
@@ -147,22 +147,22 @@ export default function PenilaianPage() {
             </tbody>
           </table>
           {submissions.length === 0 && (
-            <div className="text-center py-12 text-gray-500">Belum ada pengumpulan tugas</div>
+            <div className="text-center py-12 text-dark-400">Belum ada pengumpulan tugas</div>
           )}
         </div>
       )}
 
       {showModal && selectedSubmission && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="glass-card w-full max-w-md">
             <h2 className="text-lg font-semibold mb-2">Penilaian</h2>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-dark-400 mb-4">
               {selectedSubmission.student_nama} - {selectedSubmission.assessment_title}
             </p>
 
             {selectedSubmission.file_url && (
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                <a href={selectedSubmission.file_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 text-sm">
+              <div className="mb-4 p-3 bg-white/5 rounded-lg">
+                <a href={selectedSubmission.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-sm">
                   📎 Lihat File Jawaban
                 </a>
               </div>
@@ -170,32 +170,32 @@ export default function PenilaianPage() {
 
             <form onSubmit={handleGrade} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-dark-300 mb-1">
                   Nilai (Maks: {selectedSubmission.assessment_max_score})
                 </label>
                 <input
                   type="number"
                   value={formData.score}
                   onChange={(e) => setFormData({ ...formData, score: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   min={0}
                   max={selectedSubmission.assessment_max_score || 100}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Feedback</label>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Feedback</label>
                 <textarea
                   value={formData.feedback}
                   onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                   rows={3}
                   placeholder="Berikan feedback untuk siswa..."
                 />
               </div>
               <div className="flex gap-3 justify-end">
-                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
-                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Simpan</button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-dark-300 hover:bg-white/10 rounded-lg">Batal</button>
+                <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Simpan</button>
               </div>
             </form>
           </div>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
-import { SCHOOL_CONFIG, isValidSchoolEmail, detectRoleFromEmail } from '@/lib/config';
+import { SCHOOL_CONFIG } from '@/lib/config';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,10 +16,8 @@ export default function RegisterPage() {
   const [role, setRole] = useState<'guru' | 'siswa'>('siswa');
   const [loading, setLoading] = useState(false);
 
-  // Gabungkan local + domain jadi email lengkap
   const email = emailLocal ? `${emailLocal}@${emailDomain}` : '';
 
-  // Auto-detect role saat domain berubah
   useEffect(() => {
     if (emailDomain === 'guru.smk.id') {
       setRole('guru');
@@ -69,59 +67,66 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+    <main className="min-h-screen flex items-center justify-center bg-dark-900 bg-mesh px-4 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+
+      <div className="w-full max-w-md relative z-10 animate-slide-up">
+        <div className="glass-card">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-indigo-900">FUSION</h1>
-            <p className="text-gray-500 mt-2">{SCHOOL_CONFIG.schoolName}</p>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-glow mb-4">
+              <span className="text-white font-heading font-bold text-2xl">F</span>
+            </div>
+            <h1 className="text-3xl font-heading font-bold text-white">FUSION</h1>
+            <p className="text-dark-400 mt-2">{SCHOOL_CONFIG.schoolName}</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+              <label className="block text-sm font-medium text-dark-300 mb-2">Nama Lengkap</label>
               <input
                 type="text"
                 value={nama}
                 onChange={(e) => setNama(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="glass-input"
                 placeholder="Masukkan nama lengkap"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email Sekolah</label>
+              <label className="block text-sm font-medium text-dark-300 mb-2">Email Sekolah</label>
               <div className="flex">
                 <input
                   type="text"
                   value={emailLocal}
                   onChange={(e) => setEmailLocal(e.target.value)}
-                  className="flex-1 px-4 py-3 border border-r-0 border-gray-300 rounded-l-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                  className="flex-1 glass-input rounded-r-none border-r-0"
                   placeholder="nama"
                   required
                 />
                 <select
                   value={emailDomain}
                   onChange={(e) => setEmailDomain(e.target.value as 'student.smk.id' | 'guru.smk.id')}
-                  className="px-3 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-gray-50 text-sm font-medium text-gray-700 cursor-pointer"
+                  className="px-3 py-3 glass-input rounded-l-none text-sm font-medium cursor-pointer"
                 >
                   <option value="student.smk.id">@student.smk.id</option>
                   <option value="guru.smk.id">@guru.smk.id</option>
                 </select>
               </div>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-dark-500 mt-2">
                 Pilih domain sesuai peran Anda
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label className="block text-sm font-medium text-dark-300 mb-2">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                className="glass-input"
                 placeholder="Minimal 6 karakter"
                 minLength={6}
                 required
@@ -131,20 +136,20 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading || !emailLocal.trim()}
-              className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full"
             >
               {loading ? 'Mendaftar...' : 'Daftar'}
             </button>
           </form>
 
-          <div className="mt-6 text-center space-y-2">
-            <p className="text-sm text-gray-500">
+          <div className="mt-8 text-center space-y-3">
+            <p className="text-sm text-dark-400">
               Sudah punya akun?{' '}
-              <Link href="/login" className="text-indigo-600 hover:text-indigo-800 font-medium">
+              <Link href="/login" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
                 Masuk
               </Link>
             </p>
-            <Link href="/" className="text-sm text-gray-400 hover:text-gray-600">
+            <Link href="/" className="text-sm text-dark-500 hover:text-dark-300 transition-colors inline-block">
               Kembali ke beranda
             </Link>
           </div>

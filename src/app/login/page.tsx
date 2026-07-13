@@ -35,18 +35,27 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+    <main className="min-h-screen flex items-center justify-center bg-dark-900 bg-mesh px-4 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-3xl" />
+
+      <div className="w-full max-w-md relative z-10 animate-slide-up">
+        <div className="glass-card">
+          {/* Logo */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-indigo-900">FUSION</h1>
-            <p className="text-gray-500 mt-2">{SCHOOL_CONFIG.schoolName}</p>
-            <p className="text-sm text-gray-400 mt-1">Masuk ke akun Anda</p>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-glow mb-4">
+              <span className="text-white font-heading font-bold text-2xl">F</span>
+            </div>
+            <h1 className="text-3xl font-heading font-bold text-white">FUSION</h1>
+            <p className="text-dark-400 mt-2">{SCHOOL_CONFIG.schoolName}</p>
+            <p className="text-sm text-dark-500 mt-1">Masuk ke akun Anda</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-dark-300 mb-2">
                 Email
               </label>
               <input
@@ -54,17 +63,17 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                className="glass-input"
                 placeholder="email@domain.com"
                 required
               />
-              <p className="text-xs text-gray-400 mt-1">
-                Admin: email bebas | Guru: <strong>@guru.smk.id</strong> | Siswa: <strong>@student.smk.id</strong>
+              <p className="text-xs text-dark-500 mt-2">
+                Admin: email bebas | Guru: <strong className="text-dark-400">@guru.smk.id</strong> | Siswa: <strong className="text-dark-400">@student.smk.id</strong>
               </p>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-dark-300 mb-2">
                 Password
               </label>
               <input
@@ -72,18 +81,21 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                className="glass-input"
                 placeholder="Masukkan password"
                 required
               />
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input type="checkbox" className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
-                <span className="ml-2 text-sm text-gray-600">Ingat saya</span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-dark-600 bg-dark-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
+                />
+                <span className="text-sm text-dark-400">Ingat saya</span>
               </label>
-              <Link href="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-800">
+              <Link href="/forgot-password" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
                 Lupa password?
               </Link>
             </div>
@@ -91,20 +103,30 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full"
             >
-              {loading ? 'Masuk...' : 'Masuk'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Masuk...
+                </span>
+              ) : (
+                'Masuk'
+              )}
             </button>
           </form>
 
-          <div className="mt-6 text-center space-y-2">
-            <p className="text-sm text-gray-500">
+          <div className="mt-8 text-center space-y-3">
+            <p className="text-sm text-dark-400">
               Belum punya akun?{' '}
-              <Link href="/register" className="text-indigo-600 hover:text-indigo-800 font-medium">
+              <Link href="/register" className="text-blue-400 hover:text-blue-300 font-medium transition-colors">
                 Daftar
               </Link>
             </p>
-            <Link href="/" className="text-sm text-gray-400 hover:text-gray-600">
+            <Link href="/" className="text-sm text-dark-500 hover:text-dark-300 transition-colors inline-block">
               Kembali ke beranda
             </Link>
           </div>

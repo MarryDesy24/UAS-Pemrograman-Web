@@ -96,14 +96,14 @@ export default function MataPelajaranPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Mata Pelajaran</h1>
+        <h1 className="text-2xl font-bold text-white">Mata Pelajaran</h1>
         <button
           onClick={() => {
             setEditingSubject(null);
             setFormData({ nama: '', kode: '', deskripsi: '' });
             setShowModal(true);
           }}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
         >
           + Tambah Mata Pelajaran
         </button>
@@ -111,31 +111,31 @@ export default function MataPelajaranPage() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass-card overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-white/5 border-b border-white/10">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">No</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Kode</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Nama</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Deskripsi</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {subjects.map((subject, index) => (
-                <tr key={subject.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900 font-medium">{subject.kode}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{subject.nama}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{subject.deskripsi}</td>
+                <tr key={subject.id} className="hover:bg-white/5">
+                  <td className="px-6 py-4 text-sm text-white">{index + 1}</td>
+                  <td className="px-6 py-4 text-sm text-white font-medium">{subject.kode}</td>
+                  <td className="px-6 py-4 text-sm text-white">{subject.nama}</td>
+                  <td className="px-6 py-4 text-sm text-dark-400 max-w-xs truncate">{subject.deskripsi}</td>
                   <td className="px-6 py-4 text-sm space-x-2">
                     <button
                       onClick={() => handleEdit(subject)}
-                      className="text-indigo-600 hover:text-indigo-800"
+                      className="text-blue-400 hover:text-blue-300"
                     >
                       Edit
                     </button>
@@ -151,46 +151,46 @@ export default function MataPelajaranPage() {
             </tbody>
           </table>
           {subjects.length === 0 && (
-            <div className="text-center py-12 text-gray-500">Belum ada data mata pelajaran</div>
+            <div className="text-center py-12 text-dark-400">Belum ada data mata pelajaran</div>
           )}
         </div>
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="glass-card w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">
               {editingSubject ? 'Edit Mata Pelajaran' : 'Tambah Mata Pelajaran'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Kode</label>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Kode</label>
                 <input
                   type="text"
                   value={formData.kode}
                   onChange={(e) => setFormData({ ...formData, kode: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="MTK-001"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nama</label>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Nama</label>
                 <input
                   type="text"
                   value={formData.nama}
                   onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="Matematika"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Deskripsi</label>
                 <textarea
                   value={formData.deskripsi}
                   onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                   rows={3}
                 />
               </div>
@@ -198,13 +198,13 @@ export default function MataPelajaranPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                  className="px-4 py-2 text-dark-300 hover:bg-white/10 rounded-lg"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                 >
                   {editingSubject ? 'Update' : 'Simpan'}
                 </button>

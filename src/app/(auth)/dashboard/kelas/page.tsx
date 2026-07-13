@@ -83,91 +83,91 @@ function AdminKelasView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Manajemen Kelas</h1>
+        <h1 className="text-2xl font-bold text-white">Manajemen Kelas</h1>
         <button onClick={() => { setEditingKelas(null); setFormData({ nama: '', kode: '', guru_id: '', subject_id: '', semester: 'Ganjil', tahun_ajaran: '2024/2025' }); setShowModal(true); }}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">+ Tambah Kelas</button>
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">+ Tambah Kelas</button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" /></div>
+        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" /></div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass-card overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-white/5 border-b border-white/10">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Guru</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mata Pelajaran</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Semester</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">No</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Kode</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Nama</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Guru</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Mata Pelajaran</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Semester</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {classrooms.map((kelas, index) => (
-                <tr key={kelas.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900 font-medium">{kelas.kode}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{kelas.nama}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{kelas.guru_nama}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{kelas.subject_nama}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{kelas.semester} {kelas.tahun_ajaran}</td>
+                <tr key={kelas.id} className="hover:bg-white/5">
+                  <td className="px-6 py-4 text-sm text-white">{index + 1}</td>
+                  <td className="px-6 py-4 text-sm text-white font-medium">{kelas.kode}</td>
+                  <td className="px-6 py-4 text-sm text-white">{kelas.nama}</td>
+                  <td className="px-6 py-4 text-sm text-dark-400">{kelas.guru_nama}</td>
+                  <td className="px-6 py-4 text-sm text-dark-400">{kelas.subject_nama}</td>
+                  <td className="px-6 py-4 text-sm text-dark-400">{kelas.semester} {kelas.tahun_ajaran}</td>
                   <td className="px-6 py-4 text-sm space-x-2">
-                    <button onClick={() => handleEdit(kelas)} className="text-indigo-600 hover:text-indigo-800">Edit</button>
+                    <button onClick={() => handleEdit(kelas)} className="text-blue-400 hover:text-blue-300">Edit</button>
                     <button onClick={() => handleDelete(kelas.id)} className="text-red-600 hover:text-red-800">Hapus</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {classrooms.length === 0 && <div className="text-center py-12 text-gray-500">Belum ada data kelas</div>}
+          {classrooms.length === 0 && <div className="text-center py-12 text-dark-400">Belum ada data kelas</div>}
         </div>
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="glass-card w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">{editingKelas ? 'Edit Kelas' : 'Tambah Kelas'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Kode Kelas</label>
-                <input type="text" value={formData.kode} onChange={(e) => setFormData({ ...formData, kode: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="KLS-001" required />
+                <label className="block text-sm font-medium text-dark-300 mb-1">Kode Kelas</label>
+                <input type="text" value={formData.kode} onChange={(e) => setFormData({ ...formData, kode: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="KLS-001" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Kelas</label>
-                <input type="text" value={formData.nama} onChange={(e) => setFormData({ ...formData, nama: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Kelas X RPL 1" required />
+                <label className="block text-sm font-medium text-dark-300 mb-1">Nama Kelas</label>
+                <input type="text" value={formData.nama} onChange={(e) => setFormData({ ...formData, nama: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Kelas X RPL 1" required />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Guru</label>
-                <select value={formData.guru_id} onChange={(e) => setFormData({ ...formData, guru_id: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Guru</label>
+                <select value={formData.guru_id} onChange={(e) => setFormData({ ...formData, guru_id: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
                   <option value="">Pilih Guru</option>
                   {guruList.map((g) => <option key={g.id} value={g.id}>{g.nama}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran</label>
-                <select value={formData.subject_id} onChange={(e) => setFormData({ ...formData, subject_id: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Mata Pelajaran</label>
+                <select value={formData.subject_id} onChange={(e) => setFormData({ ...formData, subject_id: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
                   <option value="">Pilih Mata Pelajaran</option>
                   {subjectList.map((s) => <option key={s.id} value={s.id}>{s.nama}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
-                  <select value={formData.semester} onChange={(e) => setFormData({ ...formData, semester: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                  <label className="block text-sm font-medium text-dark-300 mb-1">Semester</label>
+                  <select value={formData.semester} onChange={(e) => setFormData({ ...formData, semester: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                     <option value="Ganjil">Ganjil</option>
                     <option value="Genap">Genap</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tahun Ajaran</label>
-                  <input type="text" value={formData.tahun_ajaran} onChange={(e) => setFormData({ ...formData, tahun_ajaran: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="2024/2025" />
+                  <label className="block text-sm font-medium text-dark-300 mb-1">Tahun Ajaran</label>
+                  <input type="text" value={formData.tahun_ajaran} onChange={(e) => setFormData({ ...formData, tahun_ajaran: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="2024/2025" />
                 </div>
               </div>
               <div className="flex gap-3 justify-end">
-                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
-                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">{editingKelas ? 'Update' : 'Simpan'}</button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-dark-300 hover:bg-white/10 rounded-lg">Batal</button>
+                <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">{editingKelas ? 'Update' : 'Simpan'}</button>
               </div>
             </form>
           </div>
@@ -207,27 +207,27 @@ function GuruKelasView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Kelas Saya</h1>
+      <h1 className="text-2xl font-bold text-white">Kelas Saya</h1>
       {loading ? (
-        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" /></div>
+        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" /></div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {classrooms.map((kelas) => (
-            <div key={kelas.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
+            <div key={kelas.id} className="glass-card-hover">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{kelas.kode}</span>
-                  <h3 className="mt-2 font-semibold text-gray-900">{kelas.nama}</h3>
-                  <p className="text-sm text-gray-500 mt-1">{kelas.subject_nama}</p>
+                  <span className="text-xs font-medium text-blue-400 bg-blue-500/20 px-2 py-1 rounded">{kelas.kode}</span>
+                  <h3 className="mt-2 font-semibold text-white">{kelas.nama}</h3>
+                  <p className="text-sm text-dark-400 mt-1">{kelas.subject_nama}</p>
                 </div>
               </div>
-              <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
+              <div className="mt-4 flex items-center justify-between text-sm text-dark-400">
                 <span>{kelas.semester} {kelas.tahun_ajaran}</span>
-                <span className="font-medium text-indigo-600">{kelas.member_count} siswa</span>
+                <span className="font-medium text-blue-400">{kelas.member_count} siswa</span>
               </div>
             </div>
           ))}
-          {classrooms.length === 0 && <div className="col-span-full text-center py-12 text-gray-500">Belum ada kelas</div>}
+          {classrooms.length === 0 && <div className="col-span-full text-center py-12 text-dark-400">Belum ada kelas</div>}
         </div>
       )}
     </div>
@@ -335,23 +335,23 @@ function SiswaKelasView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Kelas Saya</h1>
+        <h1 className="text-2xl font-bold text-white">Kelas Saya</h1>
         <button onClick={() => { setJoinCode(''); setShowJoinModal(true); }}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
           + Join Kelas
         </button>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" /></div>
+        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" /></div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {classrooms.map((kelas) => (
-            <div key={kelas.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
-              <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{kelas.kode}</span>
-              <h3 className="mt-2 font-semibold text-gray-900">{kelas.nama}</h3>
-              <p className="text-sm text-gray-500 mt-1">{kelas.subject_nama}</p>
-              <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
+            <div key={kelas.id} className="glass-card-hover">
+              <span className="text-xs font-medium text-blue-400 bg-blue-500/20 px-2 py-1 rounded">{kelas.kode}</span>
+              <h3 className="mt-2 font-semibold text-white">{kelas.nama}</h3>
+              <p className="text-sm text-dark-400 mt-1">{kelas.subject_nama}</p>
+              <div className="mt-4 flex items-center justify-between text-sm text-dark-400">
                 <span>Oleh: {kelas.guru_nama}</span>
                 <span>{kelas.semester} {kelas.tahun_ajaran}</span>
               </div>
@@ -364,7 +364,7 @@ function SiswaKelasView() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
-              <p className="text-gray-500 mb-2">Belum ada kelas yang diikuti</p>
+              <p className="text-dark-400 mb-2">Belum ada kelas yang diikuti</p>
               <p className="text-sm text-gray-400">Klik "Join Kelas" dan masukkan kode kelas dari guru Anda</p>
             </div>
           )}
@@ -373,26 +373,26 @@ function SiswaKelasView() {
 
       {/* Join Kelas Modal */}
       {showJoinModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="glass-card w-full max-w-md">
             <h2 className="text-lg font-semibold mb-2">Join Kelas</h2>
-            <p className="text-sm text-gray-500 mb-4">Masukkan kode kelas yang diberikan oleh guru</p>
+            <p className="text-sm text-dark-400 mb-4">Masukkan kode kelas yang diberikan oleh guru</p>
             <form onSubmit={handleJoin} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Kode Kelas</label>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Kode Kelas</label>
                 <input
                   type="text"
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-center text-lg font-mono tracking-widest uppercase"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-center text-lg font-mono tracking-widest uppercase"
                   placeholder="Contoh: KLS-001"
                   required
                   autoFocus
                 />
               </div>
               <div className="flex gap-3 justify-end">
-                <button type="button" onClick={() => setShowJoinModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Batal</button>
-                <button type="submit" disabled={joining} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
+                <button type="button" onClick={() => setShowJoinModal(false)} className="px-4 py-2 text-dark-300 hover:bg-white/10 rounded-lg">Batal</button>
+                <button type="submit" disabled={joining} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50">
                   {joining ? 'Bergabung...' : 'Gabung'}
                 </button>
               </div>
@@ -423,7 +423,7 @@ export default function KelasPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
       </div>
     );
   }

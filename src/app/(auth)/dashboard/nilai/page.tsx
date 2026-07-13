@@ -57,29 +57,29 @@ export default function NilaiPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Nilai Saya</h1>
+      <h1 className="text-2xl font-bold text-white">Nilai Saya</h1>
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
         </div>
       ) : (
         <>
           {submissions.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                <p className="text-sm text-gray-500">Total Tugas</p>
-                <p className="text-2xl font-bold text-gray-900">{submissions.length}</p>
+              <div className="glass-card">
+                <p className="text-sm text-dark-400">Total Tugas</p>
+                <p className="text-2xl font-bold text-white">{submissions.length}</p>
               </div>
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                <p className="text-sm text-gray-500">Sudah Dinilai</p>
+              <div className="glass-card">
+                <p className="text-sm text-dark-400">Sudah Dinilai</p>
                 <p className="text-2xl font-bold text-green-600">
                   {submissions.filter((s) => s.score !== null).length}
                 </p>
               </div>
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                <p className="text-sm text-gray-500">Rata-rata Nilai</p>
-                <p className="text-2xl font-bold text-indigo-600">
+              <div className="glass-card">
+                <p className="text-sm text-dark-400">Rata-rata Nilai</p>
+                <p className="text-2xl font-bold text-blue-400">
                   {submissions.filter((s) => s.score !== null).length > 0
                     ? Math.round(
                         submissions
@@ -94,38 +94,38 @@ export default function NilaiPage() {
             </div>
           )}
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="glass-card overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-white/5 border-b border-white/10">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assessment</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kelas</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nilai</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Feedback</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">No</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Assessment</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Kelas</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Tanggal</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Nilai</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Feedback</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {submissions.map((sub, index) => (
-                  <tr key={sub.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{sub.assessment_title}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">{sub.classroom_nama}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                  <tr key={sub.id} className="hover:bg-white/5">
+                    <td className="px-6 py-4 text-sm text-white">{index + 1}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-white">{sub.assessment_title}</td>
+                    <td className="px-6 py-4 text-sm text-dark-400">{sub.classroom_nama}</td>
+                    <td className="px-6 py-4 text-sm text-dark-400">
                       {new Date(sub.submitted_at).toLocaleDateString('id-ID')}
                     </td>
                     <td className="px-6 py-4">
                       {sub.score !== null && sub.score !== undefined ? (
                         <span className={`text-lg font-bold ${getScoreColor(sub.score, sub.assessment_max_score || 100)}`}>
                           {sub.score}
-                          <span className="text-sm font-normal text-gray-500">/{sub.assessment_max_score}</span>
+                          <span className="text-sm font-normal text-dark-400">/{sub.assessment_max_score}</span>
                         </span>
                       ) : (
                         <span className="text-sm text-gray-400">Belum dinilai</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                    <td className="px-6 py-4 text-sm text-dark-400 max-w-xs truncate">
                       {sub.feedback || '-'}
                     </td>
                   </tr>
@@ -133,7 +133,7 @@ export default function NilaiPage() {
               </tbody>
             </table>
             {submissions.length === 0 && (
-              <div className="text-center py-12 text-gray-500">Belum ada nilai</div>
+              <div className="text-center py-12 text-dark-400">Belum ada nilai</div>
             )}
           </div>
         </>

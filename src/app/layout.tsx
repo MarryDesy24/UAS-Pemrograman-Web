@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'FUSION - Platform Pembelajaran Sekolah',
@@ -17,9 +14,32 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={inter.className}>
+      <body className="bg-dark-900 text-dark-200 font-body antialiased">
         {children}
-        <Toaster position="top-right" />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: 'rgba(30, 41, 59, 0.95)',
+              color: '#e2e8f0',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '12px',
+            },
+            success: {
+              iconTheme: {
+                primary: '#22c55e',
+                secondary: '#e2e8f0',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#e2e8f0',
+              },
+            },
+          }}
+        />
       </body>
     </html>
   );
