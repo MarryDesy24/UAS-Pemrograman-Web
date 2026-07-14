@@ -584,20 +584,29 @@ function SiswaKelasView() {
   const [joinCode, setJoinCode] = useState('');
   const [joining, setJoining] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
+  const [pendingJoinCode, setPendingJoinCode] = useState<string | null>(null);
 
+  // Ambil parameter ?join dari URL saat mount
   useEffect(() => {
-    fetchData();
-    // Auto-join jika ada ?join=CODE di URL
     const params = new URLSearchParams(window.location.search);
     const joinParam = params.get('join');
     if (joinParam) {
-      setJoinCode(joinParam);
-      // Hapus parameter dari URL agar bisa refresh tanpa auto-join lagi
+      setPendingJoinCode(joinParam);
       window.history.replaceState({}, '', window.location.pathname);
-      // Auto join setelah data loaded
-      setTimeout(() => handleJoin(joinParam), 1000);
     }
   }, []);
+
+  // Fetch data siswa
+  useEffect(() => { fetchData(); }, []);
+
+  // Auto-join setelah user authenticated dan data loaded
+  useEffect(() => {
+    if (!loading && pendingJoinCode) {
+      const code = pendingJoinCode;
+      setPendingJoinCode(null);
+      handleJoin(code);
+    }
+  }, [loading, pendingJoinCode]);
 
   const fetchData = async () => {
     const { data: user } = await supabase.auth.getUser();
