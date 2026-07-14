@@ -252,7 +252,7 @@ function GuruKelasView() {
       const url = await QRCode.toDataURL(kode, {
         width: 256,
         margin: 2,
-        color: { dark: '#ffffff', light: '#00000000' },
+        color: { dark: '#000000', light: '#ffffff' },
       });
       setQrDataUrl(url);
       setQrKode(kode);
