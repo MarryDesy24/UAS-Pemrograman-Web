@@ -649,6 +649,8 @@ function SiswaKelasView() {
     const { data: user } = await supabase.auth.getUser();
     const cleanCode = code.trim().toUpperCase();
 
+    console.log('[QR DEBUG] join with code:', cleanCode, 'from raw:', code);
+
     const { data: classroom, error: findError } = await supabase
       .from('classrooms')
       .select('*')
@@ -656,7 +658,8 @@ function SiswaKelasView() {
       .single();
 
     if (findError || !classroom) {
-      toast.error('Kode kelas tidak ditemukan');
+      console.error('[QR DEBUG] not found:', cleanCode, findError);
+      toast.error(`Kode kelas "${cleanCode}" tidak ditemukan`);
       setJoining(false);
       return;
     }
@@ -697,14 +700,28 @@ function SiswaKelasView() {
   };
 
   const extractJoinCode = (text: string): string => {
+    const trimmed = text.trim();
+
+    // Method 1: URL with search params  e.g. https://...?join=KLS-123
     try {
-      if (text.includes('join=')) {
-        const url = new URL(text);
+      if (trimmed.includes('join=')) {
+        const url = new URL(trimmed);
         const joinParam = url.searchParams.get('join');
-        if (joinParam) return joinParam;
+        if (joinParam) return joinParam.trim();
       }
     } catch {}
-    return text;
+
+    // Method 2: regex fallback  e.g. ...?join=KLS-123&... or ...?join=KLS-123
+    const match = trimmed.match(/[?&]join=([^&\s]+)/i);
+    if (match) return decodeURIComponent(match[1]).trim();
+
+    // Method 3: if it looks like a plain code (alphanumeric + dash), use as-is
+    if (/^[A-Z0-9\-]+$/i.test(trimmed) && trimmed.length <= 30) {
+      return trimmed;
+    }
+
+    // Method 4: fallback — return raw text
+    return trimmed;
   };
 
   // Cleanup scanner on unmount
