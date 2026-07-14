@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Classroom, User, Subject } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
 import toast from 'react-hot-toast';
+import QRCode from 'qrcode';
 
 // ============================================
 // ADMIN: Full CRUD
@@ -178,15 +179,26 @@ function AdminKelasView() {
 }
 
 // ============================================
-// GURU: View only their classes
+// GURU: View classes + manage students + QR
 // ============================================
 function GuruKelasView() {
   const [classrooms, setClassrooms] = useState<(Classroom & { subject_nama?: string; member_count?: number })[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedKelas, setSelectedKelas] = useState<(Classroom & { subject_nama?: string }) | null>(null);
+  const [members, setMembers] = useState<(User & { joined_at?: string })[]>([]);
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [showAddStudent, setShowAddStudent] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [showQR, setShowQR] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState('');
+  const [qrKode, setQrKode] = useState('');
+  const [allSiswa, setAllSiswa] = useState<User[]>([]);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchClassrooms(); }, []);
 
-  const fetchData = async () => {
+  const fetchClassrooms = async () => {
     const { data: user } = await supabase.auth.getUser();
     const { data: classroomsRes } = await supabase.from('classrooms').select('*').eq('guru_id', user.user?.id || '').order('nama');
     const { data: subjectRes } = await supabase.from('subjects').select('*');
@@ -205,6 +217,309 @@ function GuruKelasView() {
     setLoading(false);
   };
 
+  const fetchMembers = async (classroomId: string) => {
+    setMembersLoading(true);
+    const { data: memberData } = await supabase
+      .from('classroom_members')
+      .select('*')
+      .eq('classroom_id', classroomId);
+
+    if (memberData && memberData.length > 0) {
+      const studentIds = memberData.map((m) => m.student_id);
+      const { data: usersData } = await supabase
+        .from('users')
+        .select('*')
+        .in('id', studentIds);
+
+      const enriched = memberData.map((m) => ({
+        ...usersData?.find((u) => u.id === m.student_id),
+        joined_at: m.joined_at,
+      })).filter(Boolean);
+      setMembers(enriched as (User & { joined_at?: string })[]);
+    } else {
+      setMembers([]);
+    }
+    setMembersLoading(false);
+  };
+
+  const handleSelectKelas = async (kelas: Classroom & { subject_nama?: string }) => {
+    setSelectedKelas(kelas);
+    await fetchMembers(kelas.id);
+  };
+
+  const generateQR = async (kode: string) => {
+    try {
+      const url = await QRCode.toDataURL(kode, {
+        width: 256,
+        margin: 2,
+        color: { dark: '#ffffff', light: '#00000000' },
+      });
+      setQrDataUrl(url);
+      setQrKode(kode);
+      setShowQR(true);
+    } catch {
+      toast.error('Gagal generate QR code');
+    }
+  };
+
+  const copyKode = (kode: string) => {
+    navigator.clipboard.writeText(kode);
+    toast.success('Kode kelas berhasil disalin');
+  };
+
+  const fetchAllSiswa = async () => {
+    const { data } = await supabase.from('users').select('*').eq('role', 'siswa').order('nama');
+    setAllSiswa(data || []);
+  };
+
+  const handleOpenAddStudent = async () => {
+    setShowAddStudent(true);
+    setSearchQuery('');
+    setSearchResults([]);
+    await fetchAllSiswa();
+  };
+
+  const handleSearchStudent = (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    const q = query.toLowerCase();
+    const filtered = allSiswa.filter(
+      (s) => !members.find((m) => m.id === s.id) &&
+        (s.nama.toLowerCase().includes(q) || s.email.toLowerCase().includes(q))
+    );
+    setSearchResults(filtered);
+  };
+
+  const handleAddStudent = async (studentId: string) => {
+    if (!selectedKelas) return;
+
+    const { error } = await supabase.from('classroom_members').insert({
+      classroom_id: selectedKelas.id,
+      student_id: studentId,
+    });
+
+    if (error) {
+      toast.error('Gagal menambahkan siswa');
+    } else {
+      toast.success('Siswa berhasil ditambahkan');
+      setShowAddStudent(false);
+      await fetchMembers(selectedKelas.id);
+      fetchClassrooms();
+    }
+  };
+
+  const handleRemoveStudent = async (studentId: string) => {
+    if (!selectedKelas) return;
+    if (!confirm('Yakin ingin mengeluarkan siswa dari kelas ini?')) return;
+
+    const { error } = await supabase
+      .from('classroom_members')
+      .delete()
+      .eq('classroom_id', selectedKelas.id)
+      .eq('student_id', studentId);
+
+    if (error) {
+      toast.error('Gagal mengeluarkan siswa');
+    } else {
+      toast.success('Siswa berhasil dikeluarkan');
+      await fetchMembers(selectedKelas.id);
+      fetchClassrooms();
+    }
+  };
+
+  // Detail view
+  if (selectedKelas) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <button onClick={() => { setSelectedKelas(null); setMembers([]); }} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-white">{selectedKelas.nama}</h1>
+            <p className="text-dark-400">{selectedKelas.subject_nama} &middot; {selectedKelas.semester} {selectedKelas.tahun_ajaran}</p>
+          </div>
+        </div>
+
+        {/* Kelas Info & QR */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Kode Kelas */}
+          <div className="glass-card">
+            <h2 className="font-semibold text-white mb-4">Kode Kelas</h2>
+            <div className="flex items-center gap-3">
+              <div className="flex-1 px-4 py-3 bg-white/5 rounded-lg border border-white/10 font-mono text-xl text-white tracking-widest text-center">
+                {selectedKelas.kode}
+              </div>
+              <button onClick={() => copyKode(selectedKelas.kode)} className="p-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors" title="Salin kode">
+                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              </button>
+              <button onClick={() => generateQR(selectedKelas.kode)} className="p-3 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg transition-colors" title="Tampilkan QR Code">
+                <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-xs text-dark-400 mt-3">Bagikan kode ini kepada siswa untuk bergabung ke kelas</p>
+          </div>
+
+          {/* Statistik Kelas */}
+          <div className="glass-card">
+            <h2 className="font-semibold text-white mb-4">Statistik Kelas</h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between py-2">
+                <span className="text-sm text-dark-400">Total Siswa</span>
+                <span className="text-lg font-bold text-white">{members.length}</span>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <span className="text-sm text-dark-400">Kode Kelas</span>
+                <span className="font-mono text-white">{selectedKelas.kode}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Daftar Siswa */}
+        <div className="glass-card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-white">Daftar Siswa ({members.length})</h2>
+            <button onClick={handleOpenAddStudent} className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Tambah Siswa
+            </button>
+          </div>
+
+          {membersLoading ? (
+            <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent" /></div>
+          ) : members.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-white/5 border-b border-white/10">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase">No</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase">Nama</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase">Email</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase">Bergabung</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-dark-400 uppercase">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {members.map((siswa, idx) => (
+                    <tr key={siswa.id} className="hover:bg-white/5">
+                      <td className="px-4 py-3 text-sm text-white">{idx + 1}</td>
+                      <td className="px-4 py-3 text-sm text-white font-medium">{siswa.nama}</td>
+                      <td className="px-4 py-3 text-sm text-dark-400">{siswa.email}</td>
+                      <td className="px-4 py-3 text-sm text-dark-400">
+                        {siswa.joined_at ? new Date(siswa.joined_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <button onClick={() => handleRemoveStudent(siswa.id)} className="text-red-400 hover:text-red-300 text-sm">
+                          Keluarkan
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-dark-400">
+              <p>Belum ada siswa di kelas ini</p>
+              <p className="text-sm mt-1">Klik "Tambah Siswa" untuk menambahkan siswa ke kelas</p>
+            </div>
+          )}
+        </div>
+
+        {/* Modal Tambah Siswa */}
+        {showAddStudent && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="glass-card w-full max-w-lg max-h-[80vh] flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-white">Tambah Siswa ke Kelas</h2>
+                <button onClick={() => setShowAddStudent(false)} className="p-1 hover:bg-white/10 rounded-lg">
+                  <svg className="w-5 h-5 text-dark-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="relative mb-4">
+                <svg className="w-5 h-5 text-dark-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Cari nama atau email siswa..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearchStudent(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-dark-400 outline-none focus:border-blue-500"
+                  autoFocus
+                />
+              </div>
+
+              <div className="overflow-y-auto flex-1 space-y-2">
+                {searchQuery && searchResults.length > 0 ? (
+                  searchResults.map((siswa) => (
+                    <div key={siswa.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-sm font-medium text-blue-400">
+                          {siswa.nama.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-white">{siswa.nama}</p>
+                          <p className="text-xs text-dark-400">{siswa.email}</p>
+                        </div>
+                      </div>
+                      <button onClick={() => handleAddStudent(siswa.id)} className="px-3 py-1.5 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors">
+                        Tambah
+                      </button>
+                    </div>
+                  ))
+                ) : searchQuery && searchResults.length === 0 ? (
+                  <div className="text-center py-8 text-dark-400">
+                    <p>Tidak ditemukan siswa yang cocok</p>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-dark-400">
+                    <p>Ketik nama atau email untuk mencari siswa</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal QR Code */}
+        {showQR && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowQR(false)}>
+            <div className="glass-card w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+              <div className="text-center">
+                <h2 className="text-lg font-semibold text-white mb-2">QR Code Kelas</h2>
+                <p className="text-sm text-dark-400 mb-4">Scan QR ini untuk join kelas {selectedKelas.nama}</p>
+                <div className="bg-white p-4 rounded-xl inline-block">
+                  {qrDataUrl && <img src={qrDataUrl} alt="QR Code" className="w-48 h-48 mx-auto" />}
+                </div>
+                <p className="text-xs text-dark-400 mt-4 font-mono">{selectedKelas.kode}</p>
+                <button onClick={() => setShowQR(false)} className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                  Tutup
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // List view
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-white">Kelas Saya</h1>
@@ -213,13 +528,18 @@ function GuruKelasView() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {classrooms.map((kelas) => (
-            <div key={kelas.id} className="glass-card-hover">
+            <div key={kelas.id} className="glass-card-hover cursor-pointer" onClick={() => handleSelectKelas(kelas)}>
               <div className="flex items-start justify-between">
                 <div>
                   <span className="text-xs font-medium text-blue-400 bg-blue-500/20 px-2 py-1 rounded">{kelas.kode}</span>
                   <h3 className="mt-2 font-semibold text-white">{kelas.nama}</h3>
                   <p className="text-sm text-dark-400 mt-1">{kelas.subject_nama}</p>
                 </div>
+                <button onClick={(e) => { e.stopPropagation(); generateQR(kelas.kode); }} className="p-2 hover:bg-white/10 rounded-lg transition-colors" title="QR Code">
+                  <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                  </svg>
+                </button>
               </div>
               <div className="mt-4 flex items-center justify-between text-sm text-dark-400">
                 <span>{kelas.semester} {kelas.tahun_ajaran}</span>
@@ -230,12 +550,31 @@ function GuruKelasView() {
           {classrooms.length === 0 && <div className="col-span-full text-center py-12 text-dark-400">Belum ada kelas</div>}
         </div>
       )}
+
+      {/* Modal QR Code */}
+      {showQR && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowQR(false)}>
+          <div className="glass-card w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center">
+              <h2 className="text-lg font-semibold text-white mb-2">QR Code Kelas</h2>
+              <p className="text-sm text-dark-400 mb-4">Scan QR ini untuk join kelas</p>
+              <div className="bg-white p-4 rounded-xl inline-block">
+                {qrDataUrl && <img src={qrDataUrl} alt="QR Code" className="w-48 h-48 mx-auto" />}
+              </div>
+              <p className="text-xs text-dark-400 mt-4 font-mono">{qrKode}</p>
+              <button onClick={() => setShowQR(false)} className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 // ============================================
-// SISWA: View joined classes + Join by code
+// SISWA: View joined classes + Join by code/QR
 // ============================================
 function SiswaKelasView() {
   const [classrooms, setClassrooms] = useState<(Classroom & { guru_nama?: string; subject_nama?: string })[]>([]);
@@ -243,6 +582,7 @@ function SiswaKelasView() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [joinCode, setJoinCode] = useState('');
   const [joining, setJoining] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
 
   useEffect(() => { fetchData(); }, []);
 
@@ -280,19 +620,17 @@ function SiswaKelasView() {
     setLoading(false);
   };
 
-  const handleJoin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!joinCode.trim()) return;
+  const handleJoin = async (code: string) => {
+    if (!code.trim()) return;
 
     setJoining(true);
     const { data: user } = await supabase.auth.getUser();
-    const code = joinCode.trim().toUpperCase();
+    const cleanCode = code.trim().toUpperCase();
 
-    // Cari kelas berdasarkan kode
     const { data: classroom, error: findError } = await supabase
       .from('classrooms')
       .select('*')
-      .eq('kode', code)
+      .eq('kode', cleanCode)
       .single();
 
     if (findError || !classroom) {
@@ -301,7 +639,6 @@ function SiswaKelasView() {
       return;
     }
 
-    // Cek apakah sudah bergabung
     const { data: existing } = await supabase
       .from('classroom_members')
       .select('id')
@@ -315,7 +652,6 @@ function SiswaKelasView() {
       return;
     }
 
-    // Gabung kelas
     const { error: joinError } = await supabase.from('classroom_members').insert({
       classroom_id: classroom.id,
       student_id: user.user?.id || '',
@@ -326,10 +662,57 @@ function SiswaKelasView() {
     } else {
       toast.success(`Berhasil bergabung ke kelas ${classroom.nama}!`);
       setShowJoinModal(false);
+      setShowQRScanner(false);
       setJoinCode('');
       fetchData();
     }
     setJoining(false);
+  };
+
+  const handleJoinSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleJoin(joinCode);
+  };
+
+  const startQRScanner = async () => {
+    setShowQRScanner(true);
+    setShowJoinModal(false);
+
+    try {
+      const { Html5Qrcode } = await import('html5-qrcode');
+
+      const scanner = new Html5Qrcode('qr-reader');
+      await scanner.start(
+        { facingMode: 'environment' },
+        {
+          fps: 5,
+          qrbox: { width: 250, height: 250 },
+        },
+        (decodedText) => {
+          scanner.stop().then(() => {
+            scanner.clear();
+            setShowQRScanner(false);
+            handleJoin(decodedText);
+          });
+        },
+        () => {}
+      );
+    } catch {
+      toast.error('Tidak dapat mengakses kamera. Silakan gunakan kode manual.');
+      setShowQRScanner(false);
+      setShowJoinModal(true);
+    }
+  };
+
+  const stopQRScanner = async () => {
+    try {
+      const { Html5Qrcode } = await import('html5-qrcode');
+      const scanner = new Html5Qrcode('qr-reader');
+      await scanner.stop();
+      scanner.clear();
+    } catch {}
+    setShowQRScanner(false);
+    setShowJoinModal(true);
   };
 
   return (
@@ -376,8 +759,31 @@ function SiswaKelasView() {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="glass-card w-full max-w-md">
             <h2 className="text-lg font-semibold mb-2">Join Kelas</h2>
-            <p className="text-sm text-dark-400 mb-4">Masukkan kode kelas yang diberikan oleh guru</p>
-            <form onSubmit={handleJoin} className="space-y-4">
+            <p className="text-sm text-dark-400 mb-4">Masukkan kode kelas dari guru atau scan QR code</p>
+
+            {/* Tab Manual / QR */}
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={startQRScanner}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+                Scan QR Code
+              </button>
+            </div>
+
+            <div className="relative mb-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10"></div>
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-dark-800 px-2 text-dark-400">atau masukkan kode manual</span>
+              </div>
+            </div>
+
+            <form onSubmit={handleJoinSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-1">Kode Kelas</label>
                 <input
@@ -397,6 +803,24 @@ function SiswaKelasView() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* QR Scanner */}
+      {showQRScanner && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="glass-card w-full max-w-md">
+            <div className="text-center mb-4">
+              <h2 className="text-lg font-semibold text-white">Scan QR Code</h2>
+              <p className="text-sm text-dark-400">Arahkan kamera ke QR code dari guru</p>
+            </div>
+            <div id="qr-reader" className="w-full rounded-lg overflow-hidden bg-black" />
+            <div className="flex justify-center mt-4">
+              <button onClick={stopQRScanner} className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                Batal
+              </button>
+            </div>
           </div>
         </div>
       )}
