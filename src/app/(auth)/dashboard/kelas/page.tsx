@@ -696,6 +696,19 @@ function SiswaKelasView() {
     handleJoin(joinCode);
   };
 
+  const extractJoinCode = (text: string): string => {
+    // Jika URL dengan parameter ?join=CODE
+    try {
+      if (text.includes('join=')) {
+        const url = new URL(text);
+        const joinParam = url.searchParams.get('join');
+        if (joinParam) return joinParam;
+      }
+    } catch {}
+    // Jika teks biasa (kode langsung)
+    return text;
+  };
+
   const startQRScanner = async () => {
     setShowQRScanner(true);
     setShowJoinModal(false);
@@ -714,7 +727,8 @@ function SiswaKelasView() {
           scanner.stop().then(() => {
             scanner.clear();
             setShowQRScanner(false);
-            handleJoin(decodedText);
+            const code = extractJoinCode(decodedText);
+            handleJoin(code);
           });
         },
         () => {}
