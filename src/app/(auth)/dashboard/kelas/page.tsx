@@ -697,7 +697,6 @@ function SiswaKelasView() {
   };
 
   const extractJoinCode = (text: string): string => {
-    // Jika URL dengan parameter ?join=CODE
     try {
       if (text.includes('join=')) {
         const url = new URL(text);
@@ -705,48 +704,77 @@ function SiswaKelasView() {
         if (joinParam) return joinParam;
       }
     } catch {}
-    // Jika teks biasa (kode langsung)
     return text;
   };
 
-  const startQRScanner = async () => {
-    setShowQRScanner(true);
-    setShowJoinModal(false);
+  // Cleanup scanner on unmount
+  useEffect(() => {
+    return () => {
+      try {
+        const el = document.getElementById('qr-reader');
+        if (el && el.innerHTML) {
+          el.innerHTML = '';
+        }
+      } catch {}
+    };
+  }, []);
 
-    try {
-      const { Html5Qrcode } = await import('html5-qrcode');
+  // Start scanner when showQRScanner becomes true
+  useEffect(() => {
+    if (!showQRScanner) return;
 
-      const scanner = new Html5Qrcode('qr-reader');
-      await scanner.start(
-        { facingMode: 'environment' },
-        {
-          fps: 5,
-          qrbox: { width: 250, height: 250 },
-        },
-        (decodedText) => {
-          scanner.stop().then(() => {
-            scanner.clear();
+    let scanner: any = null;
+    let stopped = false;
+
+    const startScanner = async () => {
+      // Wait for DOM to render
+      await new Promise((r) => setTimeout(r, 300));
+
+      const el = document.getElementById('qr-reader');
+      if (!el || stopped) return;
+
+      try {
+        const { Html5Qrcode } = await import('html5-qrcode');
+        if (stopped) return;
+
+        scanner = new Html5Qrcode('qr-reader');
+        await scanner.start(
+          { facingMode: 'environment' },
+          { fps: 5, qrbox: { width: 250, height: 250 } },
+          async (decodedText: string) => {
+            if (stopped) return;
+            stopped = true;
+            try {
+              await scanner.stop();
+              scanner.clear();
+            } catch {}
             setShowQRScanner(false);
             const code = extractJoinCode(decodedText);
             handleJoin(code);
-          });
-        },
-        () => {}
-      );
-    } catch {
-      toast.error('Tidak dapat mengakses kamera. Silakan gunakan kode manual.');
-      setShowQRScanner(false);
-      setShowJoinModal(true);
-    }
-  };
+          },
+          () => {}
+        );
+      } catch (err) {
+        if (stopped) return;
+        console.error('QR Scanner error:', err);
+        toast.error('Tidak dapat mengakses kamera. Silakan gunakan kode manual.');
+        setShowQRScanner(false);
+        setShowJoinModal(true);
+      }
+    };
 
-  const stopQRScanner = async () => {
-    try {
-      const { Html5Qrcode } = await import('html5-qrcode');
-      const scanner = new Html5Qrcode('qr-reader');
-      await scanner.stop();
-      scanner.clear();
-    } catch {}
+    startScanner();
+
+    return () => {
+      stopped = true;
+      if (scanner) {
+        try { scanner.stop(); } catch {}
+        try { scanner.clear(); } catch {}
+      }
+    };
+  }, [showQRScanner]);
+
+  const stopQRScanner = () => {
     setShowQRScanner(false);
     setShowJoinModal(true);
   };
@@ -800,7 +828,7 @@ function SiswaKelasView() {
             {/* Tab Manual / QR */}
             <div className="flex gap-2 mb-4">
               <button
-                onClick={startQRScanner}
+                onClick={() => { setShowJoinModal(false); setShowQRScanner(true); }}
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
