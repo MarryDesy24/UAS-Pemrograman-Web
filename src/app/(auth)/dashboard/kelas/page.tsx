@@ -249,7 +249,8 @@ function GuruKelasView() {
 
   const generateQR = async (kode: string) => {
     try {
-      const url = await QRCode.toDataURL(kode, {
+      const joinUrl = `${window.location.origin}/dashboard/kelas?join=${encodeURIComponent(kode)}`;
+      const url = await QRCode.toDataURL(joinUrl, {
         width: 256,
         margin: 2,
         color: { dark: '#000000', light: '#ffffff' },
@@ -584,7 +585,19 @@ function SiswaKelasView() {
   const [joining, setJoining] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+    // Auto-join jika ada ?join=CODE di URL
+    const params = new URLSearchParams(window.location.search);
+    const joinParam = params.get('join');
+    if (joinParam) {
+      setJoinCode(joinParam);
+      // Hapus parameter dari URL agar bisa refresh tanpa auto-join lagi
+      window.history.replaceState({}, '', window.location.pathname);
+      // Auto join setelah data loaded
+      setTimeout(() => handleJoin(joinParam), 1000);
+    }
+  }, []);
 
   const fetchData = async () => {
     const { data: user } = await supabase.auth.getUser();
