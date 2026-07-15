@@ -1,11 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import { User } from '@/lib/types';
+
+export const SidebarContext = createContext<{
+  open: boolean;
+  setOpen: (v: boolean) => void;
+}>({ open: false, setOpen: () => {} });
+
+export function useSidebar() {
+  return useContext(SidebarContext);
+}
 
 export default function DashboardLayout({
   children,
@@ -15,6 +24,7 @@ export default function DashboardLayout({
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -46,12 +56,20 @@ export default function DashboardLayout({
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-dark-900 bg-mesh flex">
-      <Sidebar user={user} />
-      <div className="flex-1 flex flex-col ml-64">
-        <Header user={user} />
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+    <SidebarContext.Provider value={{ open: sidebarOpen, setOpen: setSidebarOpen }}>
+      <div className="min-h-screen bg-dark-900 bg-mesh flex">
+        <Sidebar user={user} />
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        <div className="flex-1 flex flex-col lg:ml-64">
+          <Header user={user} />
+          <main className="flex-1 p-4 md:p-6 overflow-auto">{children}</main>
+        </div>
       </div>
-    </div>
+    </SidebarContext.Provider>
   );
 }

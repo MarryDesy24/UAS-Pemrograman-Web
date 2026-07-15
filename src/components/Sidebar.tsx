@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserRole } from '@/lib/types';
+import { useSidebar } from '@/app/(auth)/layout';
 
 interface SidebarProps {
   user: {
@@ -17,6 +18,7 @@ const adminMenu = [
   { name: 'Siswa', href: '/dashboard/siswa', icon: 'users' },
   { name: 'Kelas', href: '/dashboard/kelas', icon: 'academic' },
   { name: 'Mata Pelajaran', href: '/dashboard/mata-pelajaran', icon: 'book' },
+  { name: 'Kalender', href: '/dashboard/kalender', icon: 'calendar' },
 ];
 
 const guruMenu = [
@@ -27,6 +29,7 @@ const guruMenu = [
   { name: 'Assessment', href: '/dashboard/assessment', icon: 'clipboard' },
   { name: 'Penilaian', href: '/dashboard/penilaian', icon: 'star' },
   { name: 'Pengumuman', href: '/dashboard/pengumuman', icon: 'megaphone' },
+  { name: 'Kalender', href: '/dashboard/kalender', icon: 'calendar' },
 ];
 
 const siswaMenu = [
@@ -36,18 +39,15 @@ const siswaMenu = [
   { name: 'Tugas', href: '/dashboard/tugas', icon: 'clipboard' },
   { name: 'Nilai', href: '/dashboard/nilai', icon: 'star' },
   { name: 'Pengumuman', href: '/dashboard/pengumuman', icon: 'megaphone' },
+  { name: 'Kalender', href: '/dashboard/kalender', icon: 'calendar' },
 ];
 
 function getMenuByRole(role: UserRole) {
   switch (role) {
-    case 'admin':
-      return adminMenu;
-    case 'guru':
-      return guruMenu;
-    case 'siswa':
-      return siswaMenu;
-    default:
-      return [];
+    case 'admin': return adminMenu;
+    case 'guru': return guruMenu;
+    case 'siswa': return siswaMenu;
+    default: return [];
   }
 }
 
@@ -107,6 +107,12 @@ function getIcon(iconName: string) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
         </svg>
       );
+    case 'calendar':
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -115,11 +121,42 @@ function getIcon(iconName: string) {
 export default function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
   const menu = getMenuByRole(user.role);
+  const { open, setOpen } = useSidebar();
 
   return (
-    <aside className="w-64 h-screen glass-strong flex flex-col fixed left-0 top-0 z-40">
+    <>
+      {/* Desktop sidebar - always visible on lg+ */}
+      <aside className="hidden lg:flex w-64 h-screen glass-strong flex-col fixed left-0 top-0 z-40">
+        <SidebarContent user={user} menu={menu} pathname={pathname} />
+      </aside>
+
+      {/* Mobile sidebar - toggleable */}
+      <aside
+        className={`lg:hidden fixed left-0 top-0 h-full w-64 glass-strong flex flex-col z-50 transition-transform duration-300 ${
+          open ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <SidebarContent user={user} menu={menu} pathname={pathname} onNavClick={() => setOpen(false)} />
+      </aside>
+    </>
+  );
+}
+
+function SidebarContent({
+  user,
+  menu,
+  pathname,
+  onNavClick,
+}: {
+  user: { role: UserRole; nama: string };
+  menu: { name: string; href: string; icon: string }[];
+  pathname: string;
+  onNavClick?: () => void;
+}) {
+  return (
+    <>
       {/* Logo */}
-      <div className="p-6 border-b border-white/10">
+      <div className="p-4 md:p-6 border-b border-white/10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-glow">
             <span className="text-white font-heading font-bold text-lg">F</span>
@@ -132,13 +169,14 @@ export default function Sidebar({ user }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-3 md:p-4 space-y-1 overflow-y-auto">
         {menu.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.name}
               href={item.href}
+              onClick={onNavClick}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                 isActive
                   ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
@@ -148,7 +186,7 @@ export default function Sidebar({ user }: SidebarProps) {
               <span className={isActive ? 'text-blue-400' : 'text-dark-400'}>
                 {getIcon(item.icon)}
               </span>
-              <span className="font-medium">{item.name}</span>
+              <span className="font-medium text-sm">{item.name}</span>
               {isActive && (
                 <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-400" />
               )}
@@ -158,9 +196,9 @@ export default function Sidebar({ user }: SidebarProps) {
       </nav>
 
       {/* User Profile */}
-      <div className="p-4 border-t border-white/10">
+      <div className="p-3 md:p-4 border-t border-white/10">
         <div className="flex items-center gap-3 px-4 py-3 glass rounded-xl">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shrink-0">
             <span className="text-white font-semibold text-sm">
               {user.nama.charAt(0).toUpperCase()}
             </span>
@@ -171,6 +209,6 @@ export default function Sidebar({ user }: SidebarProps) {
           </div>
         </div>
       </div>
-    </aside>
+    </>
   );
 }

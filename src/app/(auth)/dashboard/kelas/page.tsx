@@ -994,9 +994,9 @@ function SiswaKelasView() {
 
       {/* QR Scanner */}
       {showQRScanner && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="glass-card w-full max-w-md">
-            <div className="text-center mb-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="glass-card w-full max-w-sm sm:max-w-md">
+            <div className="text-center mb-3">
               <h2 className="text-lg font-semibold text-white">Scan QR Code</h2>
               <p className="text-sm text-dark-400">Arahkan kamera ke QR code dari guru</p>
             </div>

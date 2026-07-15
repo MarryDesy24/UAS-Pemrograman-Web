@@ -209,3 +209,47 @@ body {
 .glass-card-3d:hover {
   transform: rotateX(0deg) rotateY(0deg) translateZ(10px) !important;
 }
+
+/* QR Scanner responsive */
+#qr-reader {
+  width: 100% !important;
+  max-width: 100% !important;
+  border: none !important;
+}
+
+#qr-reader video {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 60vh !important;
+  object-fit: cover !important;
+  border-radius: 0.75rem !important;
+}
+
+#qr-reader__scan_region {
+  width: 100% !important;
+  min-height: 200px !important;
+}
+
+#qr-reader__dashboard {
+  display: none !important;
+}
+
+#qr-reader img[alt="Info icon"] {
+  display: none !important;
+}
+
+#qr-reader__header_message,
+#qr-reader__status_span {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  #qr-reader video {
+    max-height: 50vh !important;
+  }
+
+  #qr-reader__scan_region {
+    min-height: 180px !important;
+  }
+}
