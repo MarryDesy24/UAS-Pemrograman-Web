@@ -575,7 +575,7 @@ function GuruKelasView() {
 }
 
 // ============================================
-// SISWA: View joined classes + Join by code/QR
+// SISWA: View joined classes + Join by code/QR + Class Detail
 // ============================================
 function SiswaKelasView() {
   const [classrooms, setClassrooms] = useState<(Classroom & { guru_nama?: string; subject_nama?: string })[]>([]);
@@ -585,6 +585,10 @@ function SiswaKelasView() {
   const [joining, setJoining] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [pendingJoinCode, setPendingJoinCode] = useState<string | null>(null);
+  const [selectedKelas, setSelectedKelas] = useState<(Classroom & { guru_nama?: string; subject_nama?: string }) | null>(null);
+  const [modules, setModules] = useState<any[]>([]);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   // Ambil parameter ?join dari URL saat mount
   useEffect(() => {
@@ -642,6 +646,22 @@ function SiswaKelasView() {
     setLoading(false);
   };
 
+  const fetchClassDetail = async (classroomId: string) => {
+    setDetailLoading(true);
+    const [modulesRes, announcementsRes] = await Promise.all([
+      supabase.from('modules').select('*').eq('classroom_id', classroomId).order('created_at', { ascending: false }),
+      supabase.from('announcements').select('*').eq('classroom_id', classroomId).order('created_at', { ascending: false }),
+    ]);
+    setModules(modulesRes.data || []);
+    setAnnouncements(announcementsRes.data || []);
+    setDetailLoading(false);
+  };
+
+  const handleSelectKelas = async (kelas: Classroom & { guru_nama?: string; subject_nama?: string }) => {
+    setSelectedKelas(kelas);
+    await fetchClassDetail(kelas.id);
+  };
+
   const handleJoin = async (code: string) => {
     if (!code.trim()) return;
 
@@ -689,7 +709,14 @@ function SiswaKelasView() {
       setShowJoinModal(false);
       setShowQRScanner(false);
       setJoinCode('');
-      fetchData();
+      await fetchData();
+      // Auto-open the class detail after successful join
+      const enrichedKelas = {
+        ...classroom,
+        guru_nama: classrooms.find((c) => c.guru_id === classroom.guru_id)?.guru_nama,
+        subject_nama: classrooms.find((c) => c.subject_id === classroom.subject_id)?.subject_nama,
+      };
+      await handleSelectKelas(enrichedKelas);
     }
     setJoining(false);
   };
@@ -796,6 +823,83 @@ function SiswaKelasView() {
     setShowJoinModal(true);
   };
 
+  // Detail view for selected class
+  if (selectedKelas) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <button onClick={() => { setSelectedKelas(null); setModules([]); setAnnouncements([]); }} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-white">{selectedKelas.nama}</h1>
+            <p className="text-dark-400">{selectedKelas.subject_nama} &middot; Oleh: {selectedKelas.guru_nama}</p>
+          </div>
+        </div>
+
+        {/* Class Info */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="glass-card">
+            <p className="text-sm text-dark-400">Kode Kelas</p>
+            <p className="text-lg font-mono font-bold text-white mt-1">{selectedKelas.kode}</p>
+          </div>
+          <div className="glass-card">
+            <p className="text-sm text-dark-400">Semester</p>
+            <p className="text-lg font-bold text-white mt-1">{selectedKelas.semester}</p>
+          </div>
+          <div className="glass-card">
+            <p className="text-sm text-dark-400">Tahun Ajaran</p>
+            <p className="text-lg font-bold text-white mt-1">{selectedKelas.tahun_ajaran}</p>
+          </div>
+        </div>
+
+        {detailLoading ? (
+          <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" /></div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Modules */}
+            <div className="glass-card">
+              <h2 className="font-semibold text-white mb-4">Modul Ajar ({modules.length})</h2>
+              {modules.length > 0 ? (
+                <div className="space-y-3">
+                  {modules.map((mod) => (
+                    <div key={mod.id} className="p-3 bg-white/5 rounded-lg border border-white/10">
+                      <h3 className="font-medium text-white text-sm">{mod.title}</h3>
+                      {mod.description && <p className="text-xs text-dark-400 mt-1 line-clamp-2">{mod.description}</p>}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-dark-400 text-center py-4">Belum ada modul ajar</p>
+              )}
+            </div>
+
+            {/* Announcements */}
+            <div className="glass-card">
+              <h2 className="font-semibold text-white mb-4">Pengumuman ({announcements.length})</h2>
+              {announcements.length > 0 ? (
+                <div className="space-y-3">
+                  {announcements.map((a) => (
+                    <div key={a.id} className="p-3 bg-white/5 rounded-lg border border-white/10">
+                      <h3 className="font-medium text-white text-sm">{a.title}</h3>
+                      <p className="text-xs text-dark-400 mt-1 line-clamp-2">{a.content}</p>
+                      <p className="text-xs text-dark-500 mt-2">{new Date(a.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-dark-400 text-center py-4">Belum ada pengumuman</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // List view
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -811,7 +915,7 @@ function SiswaKelasView() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {classrooms.map((kelas) => (
-            <div key={kelas.id} className="glass-card-hover">
+            <div key={kelas.id} className="glass-card-hover cursor-pointer" onClick={() => handleSelectKelas(kelas)}>
               <span className="text-xs font-medium text-blue-400 bg-blue-500/20 px-2 py-1 rounded">{kelas.kode}</span>
               <h3 className="mt-2 font-semibold text-white">{kelas.nama}</h3>
               <p className="text-sm text-dark-400 mt-1">{kelas.subject_nama}</p>

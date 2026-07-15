@@ -658,6 +658,40 @@ GitHub
 
 ---
 
+
+
+# Berikut revisi aktivitasnya 
+
+| **Halaman**           | **Admin**                                                      | **Guru**                                                                          | **Siswa**                                                              |
+| --------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Dashboard**         | Statistik sekolah, jumlah guru, siswa, kelas, aktivitas sistem | Ringkasan kelas, progress pembelajaran, assessment belum dinilai, aktivitas siswa | Jadwal hari ini, progress belajar, deadline, nilai terbaru, pengumuman |
+| **Guru**              | CRUD Guru, Reset Password                                      | Lihat & ubah profil sendiri                                                       | -                                                                      |
+| **Siswa**             | CRUD Siswa, Reset Password                                     | Lihat daftar siswa di kelas yang diampu                                           | Lihat & ubah profil sendiri                                            |
+| **Kelas**             | CRUD Kelas                                                     | Lihat kelas yang diampu, kelola anggota kelas                                     | Lihat kelas yang diikuti, Join menggunakan kode kelas                  |
+| **Mata Pelajaran**    | CRUD seluruh mata pelajaran                                    | **CRUD mata pelajaran yang diampu**                                               | Lihat mata pelajaran yang diikuti                                      |
+| **Modul Ajar**        | Monitoring seluruh modul ajar                                  | CRUD Modul Ajar, susun urutan pembelajaran, publish/unpublish                     | Lihat modul ajar yang dipublikasikan                                   |
+| **Materi**            | Monitoring materi                                              | CRUD materi (PDF, PPT, DOC, YouTube)                                              | Lihat, unduh, tonton video, tandai selesai dipelajari                  |
+| **Assessment**        | Monitoring assessment                                          | CRUD Assessment (Pretest, Post-test, Kuis, LKPD, Tugas), atur deadline & lampiran | Mengerjakan assessment                                                 |
+| **Submission**        | Monitoring pengumpulan                                         | Lihat seluruh submission, download jawaban, beri komentar                         | Upload jawaban, edit sebelum deadline, lihat status pengumpulan        |
+| **Penilaian**         | Monitoring nilai                                               | Beri nilai, feedback, rubrik, publish nilai                                       | Lihat nilai dan feedback                                               |
+| **Progress Belajar**  | Monitoring seluruh kelas                                       | Monitoring progress tiap siswa                                                    | Lihat progress belajar pribadi                                         |
+| **Kalender Akademik** | CRUD Kalender Akademik                                         | Lihat agenda mengajar, tambah agenda kelas                                        | Lihat jadwal pembelajaran dan deadline                                 |
+| **Jadwal Pelajaran**  | CRUD Jadwal                                                    | Lihat jadwal mengajar                                                             | Lihat jadwal belajar                                                   |
+| **Pengumuman**        | CRUD Pengumuman Sekolah                                        | CRUD Pengumuman Kelas                                                             | Lihat pengumuman                                                       |
+| **Notifikasi**        | Monitoring                                                     | Menerima notifikasi aktivitas kelas                                               | Menerima notifikasi materi baru, deadline, dan nilai                   |
+| **Statistik**         | Statistik sekolah                                              | Statistik kelas (rata-rata nilai, progres belajar, tingkat penyelesaian tugas)    | Statistik pribadi (nilai rata-rata, materi selesai, tugas selesai)     |
+
+### Catatan Business Rule
+
+Agar tidak terjadi konflik data, saya menyarankan aturan berikut:
+
+* **Admin** dapat melakukan CRUD terhadap **seluruh** mata pelajaran.
+* **Guru** hanya dapat melakukan CRUD terhadap **mata pelajaran yang dibuat atau diampunya**.
+* **Siswa** hanya dapat melihat mata pelajaran yang telah terdaftar pada kelas yang diikutinya.
+
+Dengan aturan ini, aplikasi tetap fleksibel untuk demonstrasi dan pengembangan, tetapi hak akses setiap peran tetap jelas dan aman.
+
+
 # Rekomendasi Pengembangan
 
 Melihat keseluruhan kebutuhan proyek Anda (UAS sekaligus LIDM), saya menyarankan agar implementasi dilakukan secara bertahap dengan urutan berikut:
