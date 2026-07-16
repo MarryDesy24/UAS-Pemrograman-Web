@@ -2,19 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Material, Module, User } from '@/lib/types';
+import { Material, User } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
 import toast from 'react-hot-toast';
 
 export default function MateriPage() {
   const [user, setUser] = useState<User | null>(null);
-  const [materials, setMaterials] = useState<(Material & { module_title?: string })[]>([]);
-  const [modules, setModules] = useState<Module[]>([]);
+  const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
   const [formData, setFormData] = useState({
-    module_id: '',
     title: '',
     description: '',
     file_type: 'pdf' as 'pdf' | 'docx' | 'ppt' | 'youtube',
@@ -33,22 +31,8 @@ export default function MateriPage() {
     const currentUser = await getCurrentUser();
     setUser(currentUser);
 
-    const [materialsRes, modulesRes] = await Promise.all([
-      supabase.from('materials').select('*').order('created_at', { ascending: false }),
-      currentUser?.role === 'guru'
-        ? supabase.from('modules').select('*').eq('teacher_id', currentUser.id).order('title')
-        : Promise.resolve({ data: [] }),
-    ]);
-
-    if (materialsRes.data) {
-      const enriched = materialsRes.data.map((m) => ({
-        ...m,
-        module_title: modulesRes.data?.find((mod) => mod.id === m.module_id)?.title,
-      }));
-      setMaterials(enriched);
-    }
-
-    setModules(modulesRes.data || []);
+    const { data } = await supabase.from('materials').select('*').order('created_at', { ascending: false });
+    setMaterials(data || []);
     setLoading(false);
   };
 
@@ -78,8 +62,10 @@ export default function MateriPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const { data: userData } = await supabase.auth.getUser();
+
     const payload = {
-      module_id: formData.module_id,
+      module_id: null,
       title: formData.title,
       description: formData.description,
       file_type: formData.file_type,
@@ -112,13 +98,12 @@ export default function MateriPage() {
   };
 
   const resetForm = () => {
-    setFormData({ module_id: '', title: '', description: '', file_type: 'pdf', file_url: '', youtube_url: '' });
+    setFormData({ title: '', description: '', file_type: 'pdf', file_url: '', youtube_url: '' });
   };
 
   const handleEdit = (mat: Material) => {
     setEditingMaterial(mat);
     setFormData({
-      module_id: mat.module_id,
       title: mat.title,
       description: mat.description || '',
       file_type: mat.file_type || 'pdf',
@@ -175,7 +160,6 @@ export default function MateriPage() {
                 <span className="text-2xl">{getFileTypeIcon(mat.file_type || null)}</span>
                 <div className="flex-1">
                   <h3 className="font-semibold text-white">{mat.title}</h3>
-                  <p className="text-xs text-blue-400 mt-1">{mat.module_title}</p>
                   <p className="text-sm text-dark-400 mt-1 line-clamp-2">{mat.description}</p>
                 </div>
               </div>
@@ -209,13 +193,6 @@ export default function MateriPage() {
           <div className="glass-card w-full max-w-lg my-8">
             <h2 className="text-lg font-semibold mb-4">{editingMaterial ? 'Edit Materi' : 'Tambah Materi'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1">Modul Ajar</label>
-                <select value={formData.module_id} onChange={(e) => setFormData({ ...formData, module_id: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
-                  <option value="">Pilih Modul</option>
-                  {modules.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
-                </select>
-              </div>
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-1">Judul Materi</label>
                 <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />

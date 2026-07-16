@@ -24,7 +24,6 @@ const adminMenu = [
 const guruMenu = [
   { name: 'Dashboard', href: '/dashboard', icon: 'home' },
   { name: 'Kelas Saya', href: '/dashboard/kelas', icon: 'academic' },
-  { name: 'Modul Ajar', href: '/dashboard/modul-ajar', icon: 'document' },
   { name: 'Materi', href: '/dashboard/materi', icon: 'folder' },
   { name: 'Assessment', href: '/dashboard/assessment', icon: 'clipboard' },
   { name: 'Penilaian', href: '/dashboard/penilaian', icon: 'star' },

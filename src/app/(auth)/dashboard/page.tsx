@@ -67,29 +67,21 @@ export default function DashboardPage() {
         }
 
         if (currentUser?.role === 'guru') {
-          const [kelasRes, modulesRes, assessmentsRes] = await Promise.all([
+          const [kelasRes, assessmentsRes, submissionsRes] = await Promise.all([
             supabase.from('classrooms').select('*', { count: 'exact', head: true }).eq('guru_id', currentUser.id),
-            supabase.from('modules').select('*', { count: 'exact', head: true }).eq('teacher_id', currentUser.id),
-            supabase.from('assessments').select('id, module_id').order('created_at', { ascending: false }),
+            supabase.from('assessments').select('id').order('created_at', { ascending: false }),
+            supabase.from('submissions').select('id, score, assessment_id'),
           ]);
 
-          const moduleIds = modulesRes.data?.map(m => m.id) || [];
-          const assessmentIds = assessmentsRes.data
-            ?.filter(a => moduleIds.includes(a.module_id))
-            .map(a => a.id) || [];
-
+          const assessmentIds = assessmentsRes.data?.map(a => a.id) || [];
           let belumDinilai = 0;
           if (assessmentIds.length > 0) {
-            const { data: subs } = await supabase
-              .from('submissions')
-              .select('id, score')
-              .in('assessment_id', assessmentIds);
-            belumDinilai = subs?.filter(s => s.score === null).length || 0;
+            belumDinilai = submissionsRes.data?.filter(s => s.score === null && assessmentIds.includes(s.assessment_id)).length || 0;
           }
 
           setStats({
             totalGuru: kelasRes.count || 0,
-            totalSiswa: modulesRes.count || 0,
+            totalSiswa: assessmentIds.length,
             totalKelas: 0,
             totalMataPelajaran: 0,
             totalAssessment: assessmentIds.length,

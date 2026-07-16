@@ -586,7 +586,6 @@ function SiswaKelasView() {
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [pendingJoinCode, setPendingJoinCode] = useState<string | null>(null);
   const [selectedKelas, setSelectedKelas] = useState<(Classroom & { guru_nama?: string; subject_nama?: string }) | null>(null);
-  const [modules, setModules] = useState<any[]>([]);
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
 
@@ -648,12 +647,12 @@ function SiswaKelasView() {
 
   const fetchClassDetail = async (classroomId: string) => {
     setDetailLoading(true);
-    const [modulesRes, announcementsRes] = await Promise.all([
-      supabase.from('modules').select('*').eq('classroom_id', classroomId).order('created_at', { ascending: false }),
-      supabase.from('announcements').select('*').eq('classroom_id', classroomId).order('created_at', { ascending: false }),
-    ]);
-    setModules(modulesRes.data || []);
-    setAnnouncements(announcementsRes.data || []);
+    const { data } = await supabase
+      .from('announcements')
+      .select('*')
+      .eq('classroom_id', classroomId)
+      .order('created_at', { ascending: false });
+    setAnnouncements(data || []);
     setDetailLoading(false);
   };
 
@@ -828,7 +827,7 @@ function SiswaKelasView() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <button onClick={() => { setSelectedKelas(null); setModules([]); setAnnouncements([]); }} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+          <button onClick={() => { setSelectedKelas(null); setAnnouncements([]); }} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -858,41 +857,21 @@ function SiswaKelasView() {
         {detailLoading ? (
           <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" /></div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Modules */}
-            <div className="glass-card">
-              <h2 className="font-semibold text-white mb-4">Modul Ajar ({modules.length})</h2>
-              {modules.length > 0 ? (
-                <div className="space-y-3">
-                  {modules.map((mod) => (
-                    <div key={mod.id} className="p-3 bg-white/5 rounded-lg border border-white/10">
-                      <h3 className="font-medium text-white text-sm">{mod.title}</h3>
-                      {mod.description && <p className="text-xs text-dark-400 mt-1 line-clamp-2">{mod.description}</p>}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-dark-400 text-center py-4">Belum ada modul ajar</p>
-              )}
-            </div>
-
-            {/* Announcements */}
-            <div className="glass-card">
-              <h2 className="font-semibold text-white mb-4">Pengumuman ({announcements.length})</h2>
-              {announcements.length > 0 ? (
-                <div className="space-y-3">
-                  {announcements.map((a) => (
-                    <div key={a.id} className="p-3 bg-white/5 rounded-lg border border-white/10">
-                      <h3 className="font-medium text-white text-sm">{a.title}</h3>
-                      <p className="text-xs text-dark-400 mt-1 line-clamp-2">{a.content}</p>
-                      <p className="text-xs text-dark-500 mt-2">{new Date(a.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-dark-400 text-center py-4">Belum ada pengumuman</p>
-              )}
-            </div>
+          <div className="glass-card">
+            <h2 className="font-semibold text-white mb-4">Pengumuman ({announcements.length})</h2>
+            {announcements.length > 0 ? (
+              <div className="space-y-3">
+                {announcements.map((a) => (
+                  <div key={a.id} className="p-3 bg-white/5 rounded-lg border border-white/10">
+                    <h3 className="font-medium text-white text-sm">{a.title}</h3>
+                    <p className="text-xs text-dark-400 mt-1 line-clamp-2">{a.content}</p>
+                    <p className="text-xs text-dark-500 mt-2">{new Date(a.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-dark-400 text-center py-4">Belum ada pengumuman</p>
+            )}
           </div>
         )}
       </div>

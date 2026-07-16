@@ -2,19 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Assessment, Module, Classroom, AssessmentType, AssessmentQuestion } from '@/lib/types';
+import { Assessment, Classroom, AssessmentType, AssessmentQuestion } from '@/lib/types';
 import QuestionBuilder from '@/components/QuestionBuilder';
 import toast from 'react-hot-toast';
 
 export default function AssessmentPage() {
-  const [assessments, setAssessments] = useState<(Assessment & { module_title?: string; classroom_nama?: string; question_count?: number })[]>([]);
-  const [modules, setModules] = useState<Module[]>([]);
+  const [assessments, setAssessments] = useState<(Assessment & { classroom_nama?: string; question_count?: number })[]>([]);
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingAssessment, setEditingAssessment] = useState<Assessment | null>(null);
   const [formData, setFormData] = useState({
-    module_id: '',
     classroom_id: '',
     type: 'tugas' as AssessmentType,
     title: '',
@@ -36,9 +34,8 @@ export default function AssessmentPage() {
   const fetchData = async () => {
     const { data: user } = await supabase.auth.getUser();
 
-    const [assessmentsRes, modulesRes, classroomsRes] = await Promise.all([
+    const [assessmentsRes, classroomsRes] = await Promise.all([
       supabase.from('assessments').select('*').order('created_at', { ascending: false }),
-      supabase.from('modules').select('*').eq('teacher_id', user.user?.id || '').order('title'),
       supabase.from('classrooms').select('*').eq('guru_id', user.user?.id || '').order('nama'),
     ]);
 
@@ -50,7 +47,6 @@ export default function AssessmentPage() {
           .eq('assessment_id', a.id);
         return {
           ...a,
-          module_title: modulesRes.data?.find((m) => m.id === a.module_id)?.title,
           classroom_nama: classroomsRes.data?.find((c) => c.id === a.classroom_id)?.nama,
           question_count: count || 0,
         };
@@ -58,7 +54,6 @@ export default function AssessmentPage() {
       setAssessments(enriched);
     }
 
-    setModules(modulesRes.data || []);
     setClassrooms(classroomsRes.data || []);
     setLoading(false);
   };
@@ -67,7 +62,7 @@ export default function AssessmentPage() {
     e.preventDefault();
 
     const payload = {
-      module_id: formData.module_id,
+      module_id: null,
       classroom_id: formData.classroom_id,
       type: formData.type,
       title: formData.title,
@@ -99,12 +94,10 @@ export default function AssessmentPage() {
 
     // Save questions
     if (assessmentId && questions.length > 0) {
-      // Delete old questions if editing
       if (editingAssessment) {
         await supabase.from('assessment_questions').delete().eq('assessment_id', assessmentId);
       }
 
-      // Insert new questions
       const questionsToInsert = questions.map((q, i) => ({
         assessment_id: assessmentId,
         question_text: q.question_text,
@@ -130,14 +123,13 @@ export default function AssessmentPage() {
   };
 
   const resetForm = () => {
-    setFormData({ module_id: '', classroom_id: '', type: 'tugas', title: '', description: '', deadline: '', max_score: 100, attachment_url: '' });
+    setFormData({ classroom_id: '', type: 'tugas', title: '', description: '', deadline: '', max_score: 100, attachment_url: '' });
     setQuestions([]);
   };
 
   const handleEdit = async (a: Assessment) => {
     setEditingAssessment(a);
     setFormData({
-      module_id: a.module_id,
       classroom_id: a.classroom_id,
       type: a.type,
       title: a.title,
@@ -147,7 +139,6 @@ export default function AssessmentPage() {
       attachment_url: a.attachment_url || '',
     });
 
-    // Load existing questions
     const { data: existingQuestions } = await supabase
       .from('assessment_questions')
       .select('*')
@@ -254,7 +245,6 @@ export default function AssessmentPage() {
                   <h3 className="font-semibold text-white">{a.title}</h3>
                   {a.description && <p className="text-sm text-dark-400 mt-1 line-clamp-2">{a.description}</p>}
                   <div className="flex items-center gap-4 mt-2 text-xs text-dark-500">
-                    {a.module_title && <span>Modul: {a.module_title}</span>}
                     {a.deadline && <span>Deadline: {new Date(a.deadline).toLocaleDateString('id-ID')}</span>}
                     <span>Max: {a.max_score}</span>
                     <span>{a.question_count || 0} soal</span>
@@ -276,7 +266,6 @@ export default function AssessmentPage() {
                 </div>
               </div>
 
-              {/* Detail Soal */}
               {selectedAssessment === a.id && (
                 <div className="mt-4 pt-4 border-t border-white/10">
                   {detailLoading ? (
@@ -327,7 +316,6 @@ export default function AssessmentPage() {
         </div>
       )}
 
-      {/* Modal Buat/Edit Assessment */}
       {showModal && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto">
           <div className="glass-card w-full max-w-2xl my-8 mx-4">
@@ -353,21 +341,12 @@ export default function AssessmentPage() {
                   <input type="number" value={formData.max_score} onChange={(e) => setFormData({ ...formData, max_score: parseInt(e.target.value) })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white" min={0} max={100} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-dark-300 mb-1">Modul Ajar</label>
-                  <select value={formData.module_id} onChange={(e) => setFormData({ ...formData, module_id: e.target.value })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white" required>
-                    <option value="">Pilih Modul</option>
-                    {modules.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-dark-300 mb-1">Kelas</label>
-                  <select value={formData.classroom_id} onChange={(e) => setFormData({ ...formData, classroom_id: e.target.value })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white" required>
-                    <option value="">Pilih Kelas</option>
-                    {classrooms.map((c) => <option key={c.id} value={c.id}>{c.nama}</option>)}
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-dark-300 mb-1">Kelas</label>
+                <select value={formData.classroom_id} onChange={(e) => setFormData({ ...formData, classroom_id: e.target.value })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white" required>
+                  <option value="">Pilih Kelas</option>
+                  {classrooms.map((c) => <option key={c.id} value={c.id}>{c.nama}</option>)}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-dark-300 mb-1">Deskripsi</label>
@@ -392,7 +371,6 @@ export default function AssessmentPage() {
                 )}
               </div>
 
-              {/* Question Builder */}
               <div className="pt-4 border-t border-white/10">
                 <QuestionBuilder
                   assessmentId={editingAssessment?.id || ''}
