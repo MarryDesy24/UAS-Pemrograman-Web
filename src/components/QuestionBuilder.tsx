@@ -49,12 +49,13 @@ export default function QuestionBuilder({ assessmentId, questions, onQuestionsCh
 
     setUploadingMedia(true);
     const fileExt = file.name.split('.').pop();
-    const fileName = `question-media/${Date.now()}.${fileExt}`;
+    const fileName = `question-${Date.now()}.${fileExt}`;
 
     const { error } = await supabase.storage.from('materials').upload(fileName, file);
 
     if (error) {
-      toast.error('Gagal upload media');
+      console.error('Upload error:', error);
+      toast.error(`Gagal upload media: ${error.message}`);
       setUploadingMedia(false);
       return;
     }
