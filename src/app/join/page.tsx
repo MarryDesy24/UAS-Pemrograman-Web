@@ -79,12 +79,32 @@ function JoinContent() {
       return;
     }
 
+    // Pastikan user ada di tabel users (foreign key requirement)
+    const { data: userProfile } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (!userProfile) {
+      // Ambil info dari auth user
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        await supabase.from('users').upsert({
+          id: authUser.id,
+          nama: authUser.user_metadata?.nama || authUser.email?.split('@')[0] || 'Siswa',
+          email: authUser.email || '',
+          role: 'siswa',
+        });
+      }
+    }
+
     const { data: existing } = await supabase
       .from('classroom_members')
       .select('id')
       .eq('classroom_id', classroom.id)
       .eq('student_id', userId)
-      .single();
+      .maybeSingle();
 
     if (existing) {
       toast.success('Anda sudah bergabung di kelas ini!');
@@ -98,7 +118,8 @@ function JoinContent() {
     });
 
     if (joinError) {
-      toast.error('Gagal bergabung ke kelas');
+      console.error('[JOIN ERROR]', joinError);
+      toast.error(`Gagal bergabung ke kelas: ${joinError.message}`);
     } else {
       toast.success(`Berhasil bergabung ke kelas ${classroom.nama}!`);
       router.push('/dashboard/kelas');
