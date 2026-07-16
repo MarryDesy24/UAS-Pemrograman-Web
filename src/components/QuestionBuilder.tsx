@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { AssessmentQuestion, QuestionType, MediaType } from '@/lib/types';
+import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 
 interface QuestionBuilderProps {
@@ -25,11 +26,47 @@ export default function QuestionBuilder({ assessmentId, questions, onQuestionsCh
   });
 
   const [draft, setDraft] = useState(emptyQuestion());
+  const [uploadingMedia, setUploadingMedia] = useState(false);
 
   const resetDraft = () => {
     setDraft(emptyQuestion());
     setEditIndex(null);
     setShowAddForm(false);
+    setUploadingMedia(false);
+  };
+
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+
+    if (!isImage && !isVideo) {
+      toast.error('Hanya file gambar atau video yang diizinkan');
+      return;
+    }
+
+    setUploadingMedia(true);
+    const fileExt = file.name.split('.').pop();
+    const fileName = `question-media/${Date.now()}.${fileExt}`;
+
+    const { error } = await supabase.storage.from('materials').upload(fileName, file);
+
+    if (error) {
+      toast.error('Gagal upload media');
+      setUploadingMedia(false);
+      return;
+    }
+
+    const { data } = supabase.storage.from('materials').getPublicUrl(fileName);
+    setDraft({
+      ...draft,
+      media_url: data.publicUrl,
+      media_type: isImage ? 'image' : 'video',
+    });
+    setUploadingMedia(false);
+    toast.success('Media berhasil diupload');
   };
 
   const handleSave = () => {
@@ -293,25 +330,57 @@ export default function QuestionBuilder({ assessmentId, questions, onQuestionsCh
               >
                 <option value="">Tanpa Media</option>
                 <option value="image">Gambar</option>
-                <option value="video">Video (YouTube/Link)</option>
+                <option value="video">Video</option>
                 <option value="link">Link Eksternal</option>
               </select>
             </div>
-            {draft.media_type && (
+            {draft.media_type && (draft.media_type === 'image' || draft.media_type === 'video') && (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg text-sm cursor-pointer hover:bg-blue-500/30 transition-colors">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {uploadingMedia ? 'Mengupload...' : 'Upload File'}
+                    <input
+                      type="file"
+                      accept={draft.media_type === 'image' ? 'image/*' : 'video/*'}
+                      onChange={handleMediaUpload}
+                      className="hidden"
+                      disabled={uploadingMedia}
+                    />
+                  </label>
+                  <span className="self-center text-xs text-dark-500">atau</span>
+                  <input
+                    type="url"
+                    value={draft.media_url || ''}
+                    onChange={(e) => setDraft({ ...draft, media_url: e.target.value })}
+                    className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-dark-500 outline-none focus:border-blue-500"
+                    placeholder={draft.media_type === 'image' ? 'URL gambar' : 'URL video'}
+                  />
+                </div>
+              </div>
+            )}
+            {draft.media_type === 'link' && (
               <input
                 type="url"
                 value={draft.media_url || ''}
                 onChange={(e) => setDraft({ ...draft, media_url: e.target.value })}
                 className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder-dark-500 outline-none focus:border-blue-500"
-                placeholder={
-                  draft.media_type === 'image' ? 'URL gambar (https://...)' :
-                  draft.media_type === 'video' ? 'URL YouTube atau video' :
-                  'URL link'
-                }
+                placeholder="URL link"
               />
             )}
             {draft.media_type === 'image' && draft.media_url && (
               <img src={draft.media_url} alt="Preview" className="mt-2 max-w-xs rounded-lg" />
+            )}
+            {draft.media_type === 'video' && draft.media_url && (
+              <div className="mt-2">
+                {draft.media_url.includes('youtube.com') || draft.media_url.includes('youtu.be') ? (
+                  <div className="text-xs text-dark-400">YouTube: <a href={draft.media_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">{draft.media_url}</a></div>
+                ) : (
+                  <video src={draft.media_url} controls className="max-w-xs rounded-lg" />
+                )}
+              </div>
             )}
           </div>
 
