@@ -1,25 +1,28 @@
--- Fix: Tambah storage policies untuk bucket materials
+-- Fix: Buat bucket baru untuk media soal dengan policy longgar
 -- Jalankan ini di Supabase SQL Editor
 
--- 1. Pastikan bucket materials ada dan public
+-- 1. Buat bucket question-media
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('materials', 'materials', true)
-ON CONFLICT (id) DO UPDATE SET public = true;
+VALUES ('question-media', 'question-media', true)
+ON CONFLICT (id) DO NOTHING;
 
--- 2. Policy: Allow authenticated users to upload
-DROP POLICY IF EXISTS "Allow authenticated uploads" ON storage.objects;
-CREATE POLICY "Allow authenticated uploads" ON storage.objects
+-- 2. Hapus semua policy lama di bucket ini
+DROP POLICY IF EXISTS "question_media_insert" ON storage.objects;
+DROP POLICY IF EXISTS "question_media_select" ON storage.objects;
+DROP POLICY IF EXISTS "question_media_delete" ON storage.objects;
+DROP POLICY IF EXISTS "question_media_update" ON storage.objects;
+
+-- 3. Policy: Allow ALL authenticated users to upload
+CREATE POLICY "question_media_insert" ON storage.objects
   FOR INSERT TO authenticated
-  WITH CHECK (bucket_id = 'materials');
+  WITH CHECK (bucket_id = 'question-media');
 
--- 3. Policy: Allow public read access
-DROP POLICY IF EXISTS "Allow public read access" ON storage.objects;
-CREATE POLICY "Allow public read access" ON storage.objects
+-- 4. Policy: Allow EVERYONE to read (public)
+CREATE POLICY "question_media_select" ON storage.objects
   FOR SELECT TO public
-  USING (bucket_id = 'materials');
+  USING (bucket_id = 'question-media');
 
--- 4. Policy: Allow authenticated users to delete their own files
-DROP POLICY IF EXISTS "Allow authenticated deletes" ON storage.objects;
-CREATE POLICY "Allow authenticated deletes" ON storage.objects
+-- 5. Policy: Allow authenticated users to delete
+CREATE POLICY "question_media_delete" ON storage.objects
   FOR DELETE TO authenticated
-  USING (bucket_id = 'materials');
+  USING (bucket_id = 'question-media');

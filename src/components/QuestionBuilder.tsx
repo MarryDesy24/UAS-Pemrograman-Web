@@ -51,7 +51,7 @@ export default function QuestionBuilder({ assessmentId, questions, onQuestionsCh
     const fileExt = file.name.split('.').pop();
     const fileName = `question-${Date.now()}.${fileExt}`;
 
-    const { error } = await supabase.storage.from('materials').upload(fileName, file);
+    const { error } = await supabase.storage.from('question-media').upload(fileName, file);
 
     if (error) {
       console.error('Upload error:', error);
@@ -60,7 +60,7 @@ export default function QuestionBuilder({ assessmentId, questions, onQuestionsCh
       return;
     }
 
-    const { data } = supabase.storage.from('materials').getPublicUrl(fileName);
+    const { data } = supabase.storage.from('question-media').getPublicUrl(fileName);
     setDraft({
       ...draft,
       media_url: data.publicUrl,
