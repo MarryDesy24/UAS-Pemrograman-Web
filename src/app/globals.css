@@ -210,6 +210,22 @@ body {
   transform: rotateX(0deg) rotateY(0deg) translateZ(10px) !important;
 }
 
+/* Form input dark text fix */
+input[type="text"],
+input[type="date"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  color: #1e293b !important;
+}
+
+select option {
+  color: #1e293b !important;
+  background-color: #ffffff !important;
+  padding: 8px;
+}
+
 /* QR Scanner responsive */
 #qr-reader {
   width: 100% !important;

@@ -403,7 +403,7 @@ export default function KalenderPage() {
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
                   placeholder="Contoh: UTS Semester Ganjil"
                   required
                 />
@@ -413,7 +413,7 @@ export default function KalenderPage() {
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white resize-none"
                   rows={3}
                   placeholder="Deskripsi singkat event..."
                 />
@@ -425,7 +425,7 @@ export default function KalenderPage() {
                     type="date"
                     value={formData.event_date}
                     onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
                     required
                   />
                 </div>
@@ -434,7 +434,7 @@ export default function KalenderPage() {
                   <select
                     value={formData.event_type}
                     onChange={(e) => setFormData({ ...formData, event_type: e.target.value as CalendarEvent['event_type'] })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
                   >
                     {EVENT_TYPES.map((t) => (
                       <option key={t.value} value={t.value}>{t.label}</option>
@@ -448,7 +448,7 @@ export default function KalenderPage() {
                   <select
                     value={formData.classroom_id}
                     onChange={(e) => setFormData({ ...formData, classroom_id: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 bg-white"
                   >
                     <option value="">Semua Kelas</option>
                     {classrooms.map((c) => (
