@@ -210,14 +210,17 @@ body {
   transform: rotateX(0deg) rotateY(0deg) translateZ(10px) !important;
 }
 
-/* Form input dark text fix */
+/* Form input text color - light for dark theme */
 input[type="text"],
+input[type="number"],
 input[type="date"],
+input[type="datetime-local"],
 input[type="email"],
 input[type="password"],
+input[type="url"],
 textarea,
 select {
-  color: #1e293b !important;
+  color: #e2e8f0 !important;
 }
 
 select option {
