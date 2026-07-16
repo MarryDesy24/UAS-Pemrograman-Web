@@ -62,7 +62,6 @@ export default function AssessmentPage() {
     e.preventDefault();
 
     const payload = {
-      module_id: null,
       classroom_id: formData.classroom_id,
       type: formData.type,
       title: formData.title,

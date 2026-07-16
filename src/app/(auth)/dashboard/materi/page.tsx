@@ -65,7 +65,6 @@ export default function MateriPage() {
     const { data: userData } = await supabase.auth.getUser();
 
     const payload = {
-      module_id: null,
       title: formData.title,
       description: formData.description,
       file_type: formData.file_type,
