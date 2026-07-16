@@ -80,6 +80,22 @@ export interface Assessment {
   created_at: string;
 }
 
+export type QuestionType = 'paragraph' | 'multiple_choice';
+export type MediaType = 'image' | 'video' | 'link';
+
+export interface AssessmentQuestion {
+  id: string;
+  assessment_id: string;
+  question_text: string;
+  question_type: QuestionType;
+  options: string[];
+  correct_answer?: string;
+  media_url?: string;
+  media_type?: MediaType;
+  order_index: number;
+  created_at: string;
+}
+
 export interface Submission {
   id: string;
   assessment_id: string;
