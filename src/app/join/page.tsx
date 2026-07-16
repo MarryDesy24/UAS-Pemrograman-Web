@@ -108,13 +108,13 @@ function JoinContent() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
+    if (!emailLocal || !password) {
       toast.error('Masukkan email dan password');
       return;
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email: emailLocal, password });
       if (error) throw error;
 
       toast.success('Berhasil masuk!');
@@ -271,7 +271,7 @@ function JoinContent() {
                   <input
                     id="join-email"
                     type="email"
-                    value={email}
+                    value={emailLocal}
                     onChange={(e) => setEmailLocal(e.target.value)}
                     className="glass-input"
                     placeholder="nama@student.smk.id"
