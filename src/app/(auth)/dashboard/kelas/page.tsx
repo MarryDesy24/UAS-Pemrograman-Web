@@ -249,7 +249,7 @@ function GuruKelasView() {
 
   const generateQR = async (kode: string) => {
     try {
-      const joinUrl = `${window.location.origin}/dashboard/kelas?join=${encodeURIComponent(kode)}`;
+      const joinUrl = `${window.location.origin}/join?join=${encodeURIComponent(kode)}`;
       const url = await QRCode.toDataURL(joinUrl, {
         width: 256,
         margin: 2,
