@@ -195,25 +195,31 @@ function GuruKelasView() {
   const [qrDataUrl, setQrDataUrl] = useState('');
   const [qrKode, setQrKode] = useState('');
   const [allSiswa, setAllSiswa] = useState<User[]>([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [subjectList, setSubjectList] = useState<Subject[]>([]);
+  const [editForm, setEditForm] = useState({ nama: '', kode: '', subject_id: '', semester: 'Ganjil', tahun_ajaran: '' });
 
   useEffect(() => { fetchClassrooms(); }, []);
 
   const fetchClassrooms = async () => {
     const { data: user } = await supabase.auth.getUser();
-    const { data: classroomsRes } = await supabase.from('classrooms').select('*').eq('guru_id', user.user?.id || '').order('nama');
-    const { data: subjectRes } = await supabase.from('subjects').select('*');
+    const [classroomsRes, subjectRes] = await Promise.all([
+      supabase.from('classrooms').select('*').eq('guru_id', user.user?.id || '').order('nama'),
+      supabase.from('subjects').select('*').order('nama'),
+    ]);
 
-    if (classroomsRes) {
-      const enriched = await Promise.all(classroomsRes.map(async (c) => {
+    if (classroomsRes.data) {
+      const enriched = await Promise.all(classroomsRes.data.map(async (c) => {
         const { count } = await supabase.from('classroom_members').select('*', { count: 'exact', head: true }).eq('classroom_id', c.id);
         return {
           ...c,
-          subject_nama: subjectRes?.find((s) => s.id === c.subject_id)?.nama,
+          subject_nama: subjectRes.data?.find((s) => s.id === c.subject_id)?.nama,
           member_count: count || 0,
         };
       }));
       setClassrooms(enriched);
     }
+    setSubjectList(subjectRes.data || []);
     setLoading(false);
   };
 
@@ -331,6 +337,49 @@ function GuruKelasView() {
     }
   };
 
+  const handleOpenEdit = () => {
+    if (!selectedKelas) return;
+    setEditForm({
+      nama: selectedKelas.nama,
+      kode: selectedKelas.kode,
+      subject_id: selectedKelas.subject_id,
+      semester: selectedKelas.semester,
+      tahun_ajaran: selectedKelas.tahun_ajaran,
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateClass = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedKelas) return;
+
+    const { error } = await supabase.from('classrooms').update({
+      nama: editForm.nama,
+      kode: editForm.kode,
+      subject_id: editForm.subject_id,
+      semester: editForm.semester,
+      tahun_ajaran: editForm.tahun_ajaran,
+    }).eq('id', selectedKelas.id);
+
+    if (error) {
+      toast.error('Gagal mengupdate kelas');
+    } else {
+      toast.success('Kelas berhasil diupdate');
+      setShowEditModal(false);
+      const updatedKelas = {
+        ...selectedKelas,
+        nama: editForm.nama,
+        kode: editForm.kode,
+        subject_id: editForm.subject_id,
+        semester: editForm.semester,
+        tahun_ajaran: editForm.tahun_ajaran,
+        subject_nama: subjectList.find((s) => s.id === editForm.subject_id)?.nama,
+      };
+      setSelectedKelas(updatedKelas);
+      fetchClassrooms();
+    }
+  };
+
   // Detail view
   if (selectedKelas) {
     return (
@@ -345,6 +394,12 @@ function GuruKelasView() {
             <h1 className="text-2xl font-bold text-white">{selectedKelas.nama}</h1>
             <p className="text-dark-400">{selectedKelas.subject_nama} &middot; {selectedKelas.semester} {selectedKelas.tahun_ajaran}</p>
           </div>
+          <button onClick={handleOpenEdit} className="px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors text-sm flex items-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Edit
+          </button>
         </div>
 
         {/* Kelas Info & QR */}
@@ -513,6 +568,49 @@ function GuruKelasView() {
                   Tutup
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Edit Kelas */}
+        {showEditModal && (
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="glass-card w-full max-w-md">
+              <h2 className="text-lg font-semibold text-white mb-4">Edit Kelas</h2>
+              <form onSubmit={handleUpdateClass} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-dark-300 mb-1">Nama Kelas</label>
+                  <input type="text" value={editForm.nama} onChange={(e) => setEditForm({ ...editForm, nama: e.target.value })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-dark-300 mb-1">Kode Kelas</label>
+                  <input type="text" value={editForm.kode} onChange={(e) => setEditForm({ ...editForm, kode: e.target.value.toUpperCase() })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white font-mono tracking-widest" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-dark-300 mb-1">Mata Pelajaran</label>
+                  <select value={editForm.subject_id} onChange={(e) => setEditForm({ ...editForm, subject_id: e.target.value })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white" required>
+                    <option value="">Pilih Mata Pelajaran</option>
+                    {subjectList.map((s) => <option key={s.id} value={s.id}>{s.nama}</option>)}
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-dark-300 mb-1">Semester</label>
+                    <select value={editForm.semester} onChange={(e) => setEditForm({ ...editForm, semester: e.target.value })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white">
+                      <option value="Ganjil">Ganjil</option>
+                      <option value="Genap">Genap</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-dark-300 mb-1">Tahun Ajaran</label>
+                    <input type="text" value={editForm.tahun_ajaran} onChange={(e) => setEditForm({ ...editForm, tahun_ajaran: e.target.value })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white" placeholder="2024/2025" required />
+                  </div>
+                </div>
+                <div className="flex gap-3 justify-end">
+                  <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2 text-dark-300 hover:bg-white/10 rounded-lg">Batal</button>
+                  <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Simpan</button>
+                </div>
+              </form>
             </div>
           </div>
         )}
