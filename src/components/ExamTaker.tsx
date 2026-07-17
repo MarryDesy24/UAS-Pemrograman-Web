@@ -78,7 +78,7 @@ export default function ExamTaker({ assessment, onClose, onSubmit }: ExamTakerPr
       const { error } = await supabase.from('student_answers').insert(answersToInsert);
       if (error) {
         console.error('Error saving answers:', error);
-        toast.error('Gagal menyimpan jawaban');
+        toast.error(`Gagal menyimpan: ${error.message}`);
         setSubmitting(false);
         return;
       }

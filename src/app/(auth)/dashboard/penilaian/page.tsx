@@ -2,14 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Submission, Assessment } from '@/lib/types';
+import { Submission, Assessment, AssessmentQuestion } from '@/lib/types';
 import toast from 'react-hot-toast';
 
+interface EnrichedSubmission extends Submission {
+  assessment_title?: string;
+  assessment_max_score?: number;
+  student_nama?: string;
+  student_email?: string;
+  answers?: { question_id: string; question_text: string; question_type: string; answer: string; correct_answer: string | null; options: string[] }[];
+}
+
 export default function PenilaianPage() {
-  const [submissions, setSubmissions] = useState<(Submission & { assessment_title?: string; student_nama?: string; assessment_max_score?: number })[]>([]);
+  const [submissions, setSubmissions] = useState<EnrichedSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [selectedSubmission, setSelectedSubmission] = useState<(Submission & { assessment_title?: string; student_nama?: string; assessment_max_score?: number }) | null>(null);
+  const [selectedSubmission, setSelectedSubmission] = useState<EnrichedSubmission | null>(null);
   const [formData, setFormData] = useState({ score: 0, feedback: '' });
 
   useEffect(() => {
@@ -19,47 +27,74 @@ export default function PenilaianPage() {
   const fetchData = async () => {
     const { data: user } = await supabase.auth.getUser();
 
-    const { data: modulesData } = await supabase
-      .from('modules')
+    // Get classrooms owned by this guru
+    const { data: classroomsData } = await supabase
+      .from('classrooms')
       .select('id')
-      .eq('teacher_id', user.user?.id || '');
+      .eq('guru_id', user.user?.id || '');
 
-    const moduleIds = modulesData?.map((m) => m.id) || [];
+    const classroomIds = classroomsData?.map((c) => c.id) || [];
 
+    // Get assessments for these classrooms
     const { data: assessmentsData } = await supabase
       .from('assessments')
       .select('*')
-      .in('module_id', moduleIds.length > 0 ? moduleIds : ['none']);
+      .in('classroom_id', classroomIds.length > 0 ? classroomIds : ['none']);
 
     const assessmentIds = assessmentsData?.map((a) => a.id) || [];
 
+    // Get submissions
     const { data: submissionsData } = await supabase
       .from('submissions')
       .select('*')
       .in('assessment_id', assessmentIds.length > 0 ? assessmentIds : ['none'])
       .order('submitted_at', { ascending: false });
 
-    if (submissionsData) {
-      const enriched = submissionsData.map((s) => ({
+    // Get student info
+    const studentIds = submissionsData?.map((s) => s.student_id) || [];
+    const { data: studentsData } = await supabase
+      .from('users')
+      .select('id, nama, email')
+      .in('id', studentIds.length > 0 ? studentIds : ['none']);
+
+    // Get answers for each submission
+    const enriched = await Promise.all((submissionsData || []).map(async (s) => {
+      const { data: answersData } = await supabase
+        .from('student_answers')
+        .select('*')
+        .eq('assessment_id', s.assessment_id)
+        .eq('student_id', s.student_id);
+
+      // Get question details
+      const questionIds = answersData?.map((a) => a.question_id) || [];
+      const { data: questionsData } = await supabase
+        .from('assessment_questions')
+        .select('*')
+        .in('id', questionIds.length > 0 ? questionIds : ['none']);
+
+      const answers = answersData?.map((a) => {
+        const q = questionsData?.find((qq) => qq.id === a.question_id);
+        return {
+          question_id: a.question_id,
+          question_text: q?.question_text || '-',
+          question_type: q?.question_type || '-',
+          answer: a.answer || '-',
+          correct_answer: q?.correct_answer || null,
+          options: q?.options || [],
+        };
+      }) || [];
+
+      return {
         ...s,
         assessment_title: assessmentsData?.find((a) => a.id === s.assessment_id)?.title,
         assessment_max_score: assessmentsData?.find((a) => a.id === s.assessment_id)?.max_score,
-      }));
-
-      const studentIds = enriched.map((s) => s.student_id);
-      const { data: studentsData } = await supabase
-        .from('users')
-        .select('id, nama')
-        .in('id', studentIds.length > 0 ? studentIds : ['none']);
-
-      const final = enriched.map((s) => ({
-        ...s,
         student_nama: studentsData?.find((st) => st.id === s.student_id)?.nama,
-      }));
+        student_email: studentsData?.find((st) => st.id === s.student_id)?.email,
+        answers,
+      };
+    }));
 
-      setSubmissions(final);
-    }
-
+    setSubmissions(enriched);
     setLoading(false);
   };
 
@@ -87,7 +122,7 @@ export default function PenilaianPage() {
     }
   };
 
-  const openGradeModal = (sub: Submission & { assessment_title?: string; student_nama?: string; assessment_max_score?: number }) => {
+  const openDetailModal = (sub: EnrichedSubmission) => {
     setSelectedSubmission(sub);
     setFormData({ score: sub.score || 0, feedback: sub.feedback || '' });
     setShowModal(true);
@@ -108,38 +143,35 @@ export default function PenilaianPage() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Siswa</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Assessment</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">File</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Tanggal</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Nilai</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-dark-400 uppercase">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-white/5">
               {submissions.map((sub) => (
                 <tr key={sub.id} className="hover:bg-white/5">
-                  <td className="px-6 py-4 text-sm font-medium text-white">{sub.student_nama}</td>
-                  <td className="px-6 py-4 text-sm text-dark-400">{sub.assessment_title}</td>
-                  <td className="px-6 py-4 text-sm">
-                    {sub.file_url ? (
-                      <a href={sub.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">Lihat File</a>
-                    ) : '-'}
+                  <td className="px-6 py-4">
+                    <div className="text-sm font-medium text-white">{sub.student_nama}</div>
+                    <div className="text-xs text-dark-400">{sub.student_email}</div>
                   </td>
+                  <td className="px-6 py-4 text-sm text-dark-400">{sub.assessment_title}</td>
                   <td className="px-6 py-4 text-sm text-dark-400">
-                    {new Date(sub.submitted_at).toLocaleDateString('id-ID')}
+                    {new Date(sub.submitted_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </td>
                   <td className="px-6 py-4">
                     {sub.score !== null && sub.score !== undefined ? (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Dinilai: {sub.score}</span>
+                      <span className="text-green-400 font-bold">{sub.score}</span>
                     ) : (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Belum Dinilai</span>
+                      <span className="text-yellow-400 text-sm">Auto-graded</span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <button
-                      onClick={() => openGradeModal(sub)}
-                      className="text-blue-400 hover:text-blue-300"
+                      onClick={() => openDetailModal(sub)}
+                      className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 text-xs"
                     >
-                      {sub.score !== null && sub.score !== undefined ? 'Edit Nilai' : 'Beri Nilai'}
+                      Lihat Jawaban
                     </button>
                   </td>
                 </tr>
@@ -152,50 +184,76 @@ export default function PenilaianPage() {
         </div>
       )}
 
+      {/* Detail Modal */}
       {showModal && selectedSubmission && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="glass-card w-full max-w-md">
-            <h2 className="text-lg font-semibold mb-2">Penilaian</h2>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto">
+          <div className="glass-card w-full max-w-2xl my-8 mx-4">
+            <h2 className="text-lg font-semibold text-white mb-1">Detail Jawaban</h2>
             <p className="text-sm text-dark-400 mb-4">
               {selectedSubmission.student_nama} - {selectedSubmission.assessment_title}
             </p>
 
-            {selectedSubmission.file_url && (
-              <div className="mb-4 p-3 bg-white/5 rounded-lg">
-                <a href={selectedSubmission.file_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-sm">
-                  📎 Lihat File Jawaban
-                </a>
+            {/* Answers */}
+            {selectedSubmission.answers && selectedSubmission.answers.length > 0 ? (
+              <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
+                {selectedSubmission.answers.map((a, i) => (
+                  <div key={i} className="p-3 bg-white/5 rounded-lg">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-mono bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">Soal {i + 1}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded ${a.question_type === 'paragraph' ? 'bg-purple-500/20 text-purple-400' : 'bg-orange-500/20 text-orange-400'}`}>
+                        {a.question_type === 'paragraph' ? 'Isian' : 'Pilihan Ganda'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-white mb-2">{a.question_text}</p>
+                    <div className="text-sm">
+                      <span className="text-dark-400">Jawaban: </span>
+                      <span className={`font-medium ${a.correct_answer && a.answer === a.correct_answer ? 'text-green-400' : 'text-white'}`}>
+                        {a.answer || '(kosong)'}
+                      </span>
+                      {a.correct_answer && (
+                        <span className="text-dark-400 ml-2">
+                          (Kunci: <span className="text-green-400">{a.correct_answer}</span>)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
+            ) : (
+              <p className="text-sm text-dark-400 mb-6">Tidak ada jawaban soal</p>
             )}
 
-            <form onSubmit={handleGrade} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1">
-                  Nilai (Maks: {selectedSubmission.assessment_max_score})
-                </label>
-                <input
-                  type="number"
-                  value={formData.score}
-                  onChange={(e) => setFormData({ ...formData, score: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  min={0}
-                  max={selectedSubmission.assessment_max_score || 100}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-dark-300 mb-1">Feedback</label>
-                <textarea
-                  value={formData.feedback}
-                  onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-                  rows={3}
-                  placeholder="Berikan feedback untuk siswa..."
-                />
+            {/* Grade Form */}
+            <form onSubmit={handleGrade} className="space-y-4 border-t border-white/10 pt-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-dark-300 mb-1">
+                    Nilai (Maks: {selectedSubmission.assessment_max_score})
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.score}
+                    onChange={(e) => setFormData({ ...formData, score: parseInt(e.target.value) || 0 })}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white"
+                    min={0}
+                    max={selectedSubmission.assessment_max_score || 100}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-dark-300 mb-1">Feedback</label>
+                  <input
+                    type="text"
+                    value={formData.feedback}
+                    onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white"
+                    placeholder="Feedback untuk siswa"
+                  />
+                </div>
               </div>
               <div className="flex gap-3 justify-end">
-                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-dark-300 hover:bg-white/10 rounded-lg">Batal</button>
-                <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Simpan</button>
+                <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-dark-300 hover:bg-white/10 rounded-lg">Tutup</button>
+                <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Simpan Nilai</button>
               </div>
             </form>
           </div>
