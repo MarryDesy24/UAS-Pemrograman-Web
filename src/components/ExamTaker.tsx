@@ -78,7 +78,7 @@ export default function ExamTaker({ assessment, onClose, onSubmit }: ExamTakerPr
       const { error } = await supabase.from('student_answers').insert(answersToInsert);
       if (error) {
         console.error('Error saving answers:', error);
-        toast.error(`Gagal menyimpan: ${error.message}`);
+        toast.error(`Gagal menyimpan jawaban: ${error.message}`);
         setSubmitting(false);
         return;
       }
@@ -99,24 +99,31 @@ export default function ExamTaker({ assessment, onClose, onSubmit }: ExamTakerPr
       .select('id')
       .eq('assessment_id', assessment.id)
       .eq('student_id', user.user.id)
-      .single();
+      .maybeSingle();
 
     if (existingSub) {
       // Update existing submission
-      await supabase.from('submissions').update({
+      const { error: updateError } = await supabase.from('submissions').update({
         score,
         feedback: `Auto-graded: ${score}/${assessment.max_score}`,
         graded_at: new Date().toISOString(),
       }).eq('id', existingSub.id);
+      if (updateError) console.error('Update submission error:', updateError);
     } else {
       // Create new submission
-      await supabase.from('submissions').insert({
+      const { error: insertError } = await supabase.from('submissions').insert({
         assessment_id: assessment.id,
         student_id: user.user.id,
         score,
         feedback: `Auto-graded: ${score}/${assessment.max_score}`,
         graded_at: new Date().toISOString(),
       });
+      if (insertError) {
+        console.error('Insert submission error:', insertError);
+        toast.error(`Gagal menyimpan: ${insertError.message}`);
+        setSubmitting(false);
+        return;
+      }
     }
 
     toast.success(`Jawaban berhasil dikumpulkan! Nilai: ${score}`);
