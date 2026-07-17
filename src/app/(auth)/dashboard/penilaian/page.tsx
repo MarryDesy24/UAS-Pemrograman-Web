@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Submission, Assessment, AssessmentQuestion } from '@/lib/types';
+import { Submission, Assessment } from '@/lib/types';
 import toast from 'react-hot-toast';
 
 interface EnrichedSubmission extends Submission {
@@ -20,60 +20,58 @@ export default function PenilaianPage() {
   const [selectedSubmission, setSelectedSubmission] = useState<EnrichedSubmission | null>(null);
   const [formData, setFormData] = useState({ score: 0, feedback: '' });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     const { data: user } = await supabase.auth.getUser();
+    if (!user.user) { setLoading(false); return; }
 
-    // Get classrooms owned by this guru
-    const { data: classroomsData } = await supabase
+    // Step 1: Get guru's classrooms
+    const { data: classrooms } = await supabase
       .from('classrooms')
       .select('id')
-      .eq('guru_id', user.user?.id || '');
+      .eq('guru_id', user.user.id);
 
-    const classroomIds = classroomsData?.map((c) => c.id) || [];
+    const classroomIds = classrooms?.map(c => c.id) || [];
 
-    // Get assessments for these classrooms
-    const { data: assessmentsData } = await supabase
+    // Step 2: Get assessments in those classrooms
+    const { data: assessments } = await supabase
       .from('assessments')
-      .select('*')
-      .in('classroom_id', classroomIds.length > 0 ? classroomIds : ['none']);
+      .select('id, title, max_score, classroom_id')
+      .in('classroom_id', classroomIds.length > 0 ? classroomIds : ['___none___']);
 
-    const assessmentIds = assessmentsData?.map((a) => a.id) || [];
+    const assessmentIds = assessments?.map(a => a.id) || [];
 
-    // Get submissions
-    const { data: submissionsData } = await supabase
+    // Step 3: Get submissions for those assessments
+    const { data: subs } = await supabase
       .from('submissions')
       .select('*')
-      .in('assessment_id', assessmentIds.length > 0 ? assessmentIds : ['none'])
+      .in('assessment_id', assessmentIds.length > 0 ? assessmentIds : ['___none___'])
       .order('submitted_at', { ascending: false });
 
-    // Get student info
-    const studentIds = submissionsData?.map((s) => s.student_id) || [];
-    const { data: studentsData } = await supabase
+    // Step 4: Get student names
+    const studentIds = Array.from(new Set(subs?.map(s => s.student_id) || []));
+    const { data: students } = await supabase
       .from('users')
       .select('id, nama, email')
-      .in('id', studentIds.length > 0 ? studentIds : ['none']);
+      .in('id', studentIds.length > 0 ? studentIds : ['___none___']);
 
-    // Get answers for each submission
-    const enriched = await Promise.all((submissionsData || []).map(async (s) => {
+    // Step 5: Get answers for each submission
+    const enriched = await Promise.all((subs || []).map(async (s) => {
       const { data: answersData } = await supabase
         .from('student_answers')
-        .select('*')
+        .select('question_id, answer')
         .eq('assessment_id', s.assessment_id)
         .eq('student_id', s.student_id);
 
-      // Get question details
-      const questionIds = answersData?.map((a) => a.question_id) || [];
-      const { data: questionsData } = await supabase
+      const questionIds = answersData?.map(a => a.question_id) || [];
+      const { data: questions } = await supabase
         .from('assessment_questions')
-        .select('*')
-        .in('id', questionIds.length > 0 ? questionIds : ['none']);
+        .select('id, question_text, question_type, correct_answer, options')
+        .in('id', questionIds.length > 0 ? questionIds : ['___none___']);
 
-      const answers = answersData?.map((a) => {
-        const q = questionsData?.find((qq) => qq.id === a.question_id);
+      const answers = answersData?.map(a => {
+        const q = questions?.find(qq => qq.id === a.question_id);
         return {
           question_id: a.question_id,
           question_text: q?.question_text || '-',
@@ -86,10 +84,10 @@ export default function PenilaianPage() {
 
       return {
         ...s,
-        assessment_title: assessmentsData?.find((a) => a.id === s.assessment_id)?.title,
-        assessment_max_score: assessmentsData?.find((a) => a.id === s.assessment_id)?.max_score,
-        student_nama: studentsData?.find((st) => st.id === s.student_id)?.nama,
-        student_email: studentsData?.find((st) => st.id === s.student_id)?.email,
+        assessment_title: assessments?.find(a => a.id === s.assessment_id)?.title,
+        assessment_max_score: assessments?.find(a => a.id === s.assessment_id)?.max_score,
+        student_nama: students?.find(st => st.id === s.student_id)?.nama,
+        student_email: students?.find(st => st.id === s.student_id)?.email,
         answers,
       };
     }));
@@ -113,7 +111,7 @@ export default function PenilaianPage() {
       .eq('id', selectedSubmission.id);
 
     if (error) {
-      toast.error('Gagal memberikan penilaian');
+      toast.error('Gagal menyimpan penilaian');
     } else {
       toast.success('Penilaian berhasil disimpan');
       setShowModal(false);
@@ -134,7 +132,7 @@ export default function PenilaianPage() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
         </div>
       ) : (
         <div className="glass-card overflow-hidden">
@@ -152,10 +150,10 @@ export default function PenilaianPage() {
               {submissions.map((sub) => (
                 <tr key={sub.id} className="hover:bg-white/5">
                   <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-white">{sub.student_nama}</div>
-                    <div className="text-xs text-dark-400">{sub.student_email}</div>
+                    <div className="text-sm font-medium text-white">{sub.student_nama || '-'}</div>
+                    <div className="text-xs text-dark-400">{sub.student_email || '-'}</div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-dark-400">{sub.assessment_title}</td>
+                  <td className="px-6 py-4 text-sm text-dark-400">{sub.assessment_title || '-'}</td>
                   <td className="px-6 py-4 text-sm text-dark-400">
                     {new Date(sub.submitted_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </td>
@@ -166,11 +164,8 @@ export default function PenilaianPage() {
                       <span className="text-yellow-400 text-sm">Auto-graded</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-sm">
-                    <button
-                      onClick={() => openDetailModal(sub)}
-                      className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 text-xs"
-                    >
+                  <td className="px-6 py-4">
+                    <button onClick={() => openDetailModal(sub)} className="px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 text-xs">
                       Lihat Jawaban
                     </button>
                   </td>
@@ -193,7 +188,6 @@ export default function PenilaianPage() {
               {selectedSubmission.student_nama} - {selectedSubmission.assessment_title}
             </p>
 
-            {/* Answers */}
             {selectedSubmission.answers && selectedSubmission.answers.length > 0 ? (
               <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
                 {selectedSubmission.answers.map((a, i) => (
@@ -203,19 +197,26 @@ export default function PenilaianPage() {
                       <span className={`text-xs px-2 py-0.5 rounded ${a.question_type === 'paragraph' ? 'bg-purple-500/20 text-purple-400' : 'bg-orange-500/20 text-orange-400'}`}>
                         {a.question_type === 'paragraph' ? 'Isian' : 'Pilihan Ganda'}
                       </span>
+                      {a.correct_answer && a.answer === a.correct_answer && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-green-500/20 text-green-400">Benar</span>
+                      )}
+                      {a.correct_answer && a.answer !== a.correct_answer && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-red-500/20 text-red-400">Salah</span>
+                      )}
                     </div>
                     <p className="text-sm text-white mb-2">{a.question_text}</p>
                     <div className="text-sm">
-                      <span className="text-dark-400">Jawaban: </span>
+                      <span className="text-dark-400">Jawaban siswa: </span>
                       <span className={`font-medium ${a.correct_answer && a.answer === a.correct_answer ? 'text-green-400' : 'text-white'}`}>
                         {a.answer || '(kosong)'}
                       </span>
-                      {a.correct_answer && (
-                        <span className="text-dark-400 ml-2">
-                          (Kunci: <span className="text-green-400">{a.correct_answer}</span>)
-                        </span>
-                      )}
                     </div>
+                    {a.correct_answer && (
+                      <div className="text-sm mt-1">
+                        <span className="text-dark-400">Kunci jawaban: </span>
+                        <span className="text-green-400 font-medium">{a.correct_answer}</span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -223,32 +224,15 @@ export default function PenilaianPage() {
               <p className="text-sm text-dark-400 mb-6">Tidak ada jawaban soal</p>
             )}
 
-            {/* Grade Form */}
             <form onSubmit={handleGrade} className="space-y-4 border-t border-white/10 pt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-dark-300 mb-1">
-                    Nilai (Maks: {selectedSubmission.assessment_max_score})
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.score}
-                    onChange={(e) => setFormData({ ...formData, score: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white"
-                    min={0}
-                    max={selectedSubmission.assessment_max_score || 100}
-                    required
-                  />
+                  <label className="block text-sm font-medium text-dark-300 mb-1">Nilai (Maks: {selectedSubmission.assessment_max_score})</label>
+                  <input type="number" value={formData.score} onChange={(e) => setFormData({ ...formData, score: parseInt(e.target.value) || 0 })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white" min={0} max={selectedSubmission.assessment_max_score || 100} required />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-dark-300 mb-1">Feedback</label>
-                  <input
-                    type="text"
-                    value={formData.feedback}
-                    onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white"
-                    placeholder="Feedback untuk siswa"
-                  />
+                  <input type="text" value={formData.feedback} onChange={(e) => setFormData({ ...formData, feedback: e.target.value })} className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white" placeholder="Feedback untuk siswa" />
                 </div>
               </div>
               <div className="flex gap-3 justify-end">
