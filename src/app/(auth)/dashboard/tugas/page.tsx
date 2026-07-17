@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Assessment, Submission, Classroom } from '@/lib/types';
+import { Assessment, Submission, AssessmentQuestion } from '@/lib/types';
+import ExamTaker from '@/components/ExamTaker';
 import toast from 'react-hot-toast';
 
 export default function TugasPage() {
-  const [assessments, setAssessments] = useState<(Assessment & { submission?: Submission; classroom_nama?: string })[]>([]);
+  const [assessments, setAssessments] = useState<(Assessment & { submission?: Submission; classroom_nama?: string; has_questions?: boolean })[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState<string | null>(null);
+  const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -35,50 +36,24 @@ export default function TugasPage() {
       .select('*')
       .eq('student_id', user.user?.id || '');
 
-    if (assessmentsData) {
-      const enriched = assessmentsData.map((a) => ({
-        ...a,
-        submission: submissionsData?.find((s) => s.assessment_id === a.id),
-        classroom_nama: classroomsRes.data?.find((c) => c.id === a.classroom_id)?.nama,
-      }));
-      setAssessments(enriched);
-    }
+    // Check which assessments have questions
+    const assessmentsWithQuestions = await Promise.all(
+      (assessmentsData || []).map(async (a) => {
+        const { count } = await supabase
+          .from('assessment_questions')
+          .select('*', { count: 'exact', head: true })
+          .eq('assessment_id', a.id);
+        return {
+          ...a,
+          submission: submissionsData?.find((s) => s.assessment_id === a.id),
+          classroom_nama: classroomsRes.data?.find((c) => c.id === a.classroom_id)?.nama,
+          has_questions: (count || 0) > 0,
+        };
+      })
+    );
 
+    setAssessments(assessmentsWithQuestions);
     setLoading(false);
-  };
-
-  const handleSubmit = async (assessmentId: string, file: File) => {
-    setUploading(assessmentId);
-
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `submissions/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage.from('submissions').upload(filePath, file);
-
-    if (uploadError) {
-      toast.error('Gagal upload file');
-      setUploading(null);
-      return;
-    }
-
-    const { data } = supabase.storage.from('submissions').getPublicUrl(filePath);
-
-    const { error } = await supabase.from('submissions').insert({
-      assessment_id: assessmentId,
-      student_id: (await supabase.auth.getUser()).data.user?.id || '',
-      file_url: data.publicUrl,
-      file_type: fileExt,
-    });
-
-    if (error) {
-      toast.error('Gagal mengumpulkan tugas');
-    } else {
-      toast.success('Tugas berhasil dikumpulkan');
-      fetchData();
-    }
-
-    setUploading(null);
   };
 
   const isPastDeadline = (deadline: string | null) => {
@@ -88,13 +63,13 @@ export default function TugasPage() {
 
   const getTypeBadge = (type: string) => {
     const colors: Record<string, string> = {
-      'pretest': 'bg-blue-100 text-blue-700',
-      'post-test': 'bg-purple-100 text-purple-700',
-      'quiz': 'bg-green-100 text-green-700',
-      'lkpd': 'bg-yellow-100 text-yellow-700',
-      'tugas': 'bg-orange-100 text-orange-700',
+      'pretest': 'bg-blue-500/20 text-blue-400',
+      'post-test': 'bg-purple-500/20 text-purple-400',
+      'quiz': 'bg-green-500/20 text-green-400',
+      'lkpd': 'bg-yellow-500/20 text-yellow-400',
+      'tugas': 'bg-orange-500/20 text-orange-400',
     };
-    return colors[type] || 'bg-gray-100 text-dark-300';
+    return colors[type] || 'bg-white/10 text-dark-400';
   };
 
   return (
@@ -120,7 +95,7 @@ export default function TugasPage() {
                   <div className="flex items-center gap-4 mt-3 text-sm text-dark-400">
                     <span>Max: {a.max_score} poin</span>
                     {a.deadline && (
-                      <span className={isPastDeadline(a.deadline) && !a.submission ? 'text-red-600 font-medium' : ''}>
+                      <span className={isPastDeadline(a.deadline) && !a.submission ? 'text-red-400 font-medium' : ''}>
                         Deadline: {new Date(a.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
                     )}
@@ -130,7 +105,7 @@ export default function TugasPage() {
                 <div className="ml-4">
                   {a.submission ? (
                     <div className="text-right">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-400">
                         ✓ Terkumpul
                       </span>
                       {a.submission.score !== null && a.submission.score !== undefined && (
@@ -145,22 +120,20 @@ export default function TugasPage() {
                     </div>
                   ) : (
                     !isPastDeadline(a.deadline || null) ? (
-                      <label className="cursor-pointer">
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.docx,.ppt,.zip"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleSubmit(a.id, file);
-                          }}
-                        />
-                        <span className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
-                          {uploading === a.id ? 'Mengupload...' : 'Kumpulkan'}
+                      a.has_questions ? (
+                        <button
+                          onClick={() => setSelectedAssessment(a)}
+                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                        >
+                          Kerjakan
+                        </button>
+                      ) : (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-dark-400">
+          Menunggu soal
                         </span>
-                      </label>
+                      )
                     ) : (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500/20 text-red-400">
                         Deadline Terlewat
                       </span>
                     )
@@ -173,6 +146,18 @@ export default function TugasPage() {
             <div className="text-center py-12 text-dark-400 glass-card">Belum ada tugas</div>
           )}
         </div>
+      )}
+
+      {/* Exam Taker Modal */}
+      {selectedAssessment && (
+        <ExamTaker
+          assessment={selectedAssessment}
+          onClose={() => setSelectedAssessment(null)}
+          onSubmit={() => {
+            setSelectedAssessment(null);
+            fetchData();
+          }}
+        />
       )}
     </div>
   );
