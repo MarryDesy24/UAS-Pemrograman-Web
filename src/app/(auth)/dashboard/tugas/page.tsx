@@ -119,25 +119,17 @@ export default function TugasPage() {
                         <p className="text-xs text-dark-400 mt-1 max-w-xs">{a.submission.feedback}</p>
                       )}
                     </div>
+                  ) : !isPastDeadline(a.deadline || null) ? (
+                    <button
+                      onClick={() => setSelectedAssessment(a)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                    >
+                      Kerjakan
+                    </button>
                   ) : (
-                    !isPastDeadline(a.deadline || null) ? (
-                      a.has_questions ? (
-                        <button
-                          onClick={() => setSelectedAssessment(a)}
-                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
-                        >
-                          Kerjakan
-                        </button>
-                      ) : (
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/10 text-dark-400">
-          Menunggu soal
-                        </span>
-                      )
-                    ) : (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500/20 text-red-400">
-                        Deadline Terlewat
-                      </span>
-                    )
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500/20 text-red-400">
+                      Deadline Terlewat
+                    </span>
                   )}
                 </div>
               </div>

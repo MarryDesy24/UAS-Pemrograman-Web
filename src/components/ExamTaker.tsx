@@ -162,6 +162,14 @@ export default function ExamTaker({ assessment, onClose, onSubmit }: ExamTakerPr
           </button>
         </div>
 
+        {/* Belum ada soal */}
+        {questions.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-dark-400 mb-4">Belum ada soal untuk assessment ini</p>
+            <button onClick={onClose} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Tutup</button>
+          </div>
+        ) : (
+        <>
         {/* Progress */}
         <div className="mb-6">
           <div className="flex items-center justify-between text-sm text-dark-400 mb-2">
@@ -283,6 +291,8 @@ export default function ExamTaker({ assessment, onClose, onSubmit }: ExamTakerPr
             </button>
           )}
         </div>
+        </>
+        )}
       </div>
 
       {/* Confirm Submit Modal */}
