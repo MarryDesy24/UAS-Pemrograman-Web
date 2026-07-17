@@ -95,7 +95,8 @@ export default function AssessmentPage() {
     // Save questions
     if (assessmentId && questions.length > 0) {
       if (editingAssessment) {
-        await supabase.from('assessment_questions').delete().eq('assessment_id', assessmentId);
+        const { error: delError } = await supabase.from('assessment_questions').delete().eq('assessment_id', assessmentId);
+        if (delError) console.error('Delete old questions error:', delError);
       }
 
       const questionsToInsert = questions.map((q, i) => ({
@@ -112,7 +113,7 @@ export default function AssessmentPage() {
       const { error: qError } = await supabase.from('assessment_questions').insert(questionsToInsert);
       if (qError) {
         console.error('Questions insert error:', qError);
-        toast.error('Gagal menyimpan soal');
+        toast.error(`Gagal menyimpan soal: ${qError.message}`);
       }
     }
 
