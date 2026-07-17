@@ -84,7 +84,8 @@ export default function AssessmentPage() {
     } else {
       const { data, error } = await supabase.from('assessments').insert(payload).select('id').single();
       if (error) {
-        toast.error('Gagal menambah assessment');
+        console.error('Assessment insert error:', error);
+        toast.error(`Gagal: ${error.message}`);
         return;
       }
       assessmentId = data.id;
