@@ -11,16 +11,6 @@ CREATE TABLE IF NOT EXISTS student_answers (
 
 ALTER TABLE student_answers ENABLE ROW LEVEL SECURITY;
 
--- Siswa bisa manage jawaban sendiri
-CREATE POLICY "Siswa can manage own answers" ON student_answers
-  FOR ALL USING (student_id = auth.uid());
-
--- Guru bisa lihat jawaban siswa di assessment mereka
-CREATE POLICY "Guru can view student answers" ON student_answers
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM assessments a
-      JOIN modules m ON m.id = a.module_id
-      WHERE a.id = assessment_id AND m.teacher_id = auth.uid()
-    )
-  );
+-- Allow all (simple policy)
+CREATE POLICY "allow_all_student_answers" ON student_answers
+  FOR ALL USING (true) WITH CHECK (true);
