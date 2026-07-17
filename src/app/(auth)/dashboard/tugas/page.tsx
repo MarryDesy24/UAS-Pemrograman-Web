@@ -39,10 +39,11 @@ export default function TugasPage() {
     // Check which assessments have questions
     const assessmentsWithQuestions = await Promise.all(
       (assessmentsData || []).map(async (a) => {
-        const { count } = await supabase
+        const { count, error } = await supabase
           .from('assessment_questions')
           .select('*', { count: 'exact', head: true })
           .eq('assessment_id', a.id);
+        if (error) console.error('Questions check error:', error);
         return {
           ...a,
           submission: submissionsData?.find((s) => s.assessment_id === a.id),
