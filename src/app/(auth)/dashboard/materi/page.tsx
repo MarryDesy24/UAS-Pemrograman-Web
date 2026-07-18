@@ -48,7 +48,8 @@ export default function MateriPage() {
     const { error } = await supabase.storage.from('materials').upload(filePath, file);
 
     if (error) {
-      toast.error('Gagal upload file');
+      console.error('Upload error:', error);
+      toast.error(`Gagal upload file: ${error.message}`);
       setUploading(false);
       return;
     }
