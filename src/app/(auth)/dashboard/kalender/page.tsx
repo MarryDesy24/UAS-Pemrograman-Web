@@ -119,6 +119,16 @@ export default function KalenderPage() {
     return events.filter((e) => e.event_date === dateStr);
   };
 
+  const getEventError = (error: { message?: string; code?: string }) => {
+    if (error.code === '42P01' || error.message?.includes('does not exist') || error.message?.includes('relation')) {
+      return 'Tabel calendar_events belum ada di database. Jalankan database/migration-calendar.sql di Supabase SQL Editor, lalu coba lagi.';
+    }
+    if (error.message?.includes('row-level security') || error.message?.includes('violates row-level')) {
+      return 'Akses ditolak RLS. Pastikan policy "Admin can manage calendar events" sudah dibuat (database/migration-calendar.sql).';
+    }
+    return error.message || 'Terjadi kesalahan tidak diketahui';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -135,7 +145,8 @@ export default function KalenderPage() {
     if (editingEvent) {
       const { error } = await supabase.from('calendar_events').update(payload).eq('id', editingEvent.id);
       if (error) {
-        toast.error('Gagal mengupdate event');
+        console.error('Calendar update error:', error);
+        toast.error(`Gagal mengupdate event: ${getEventError(error)}`);
       } else {
         toast.success('Event berhasil diupdate');
         setShowModal(false);
@@ -145,7 +156,8 @@ export default function KalenderPage() {
     } else {
       const { error } = await supabase.from('calendar_events').insert(payload);
       if (error) {
-        toast.error('Gagal membuat event');
+        console.error('Calendar insert error:', error);
+        toast.error(`Gagal membuat event: ${getEventError(error)}`);
       } else {
         toast.success('Event berhasil dibuat');
         setShowModal(false);
