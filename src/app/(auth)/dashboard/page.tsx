@@ -59,7 +59,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<Stats>({
     totalGuru: 0, totalSiswa: 0, totalKelas: 0, totalMataPelajaran: 0,
-    totalAssessment: 0, assessmentBelumDinilai: 0,
+    totalAssessment: 0, assessmentBelumDinilai: 0, totalMateri: 0,
   });
   const [recentAnnouncements, setRecentAnnouncements] = useState<any[]>([]);
   const [deadlines, setDeadlines] = useState<DeadlineItem[]>([]);
