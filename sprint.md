@@ -102,6 +102,29 @@
 
 ---
 
+# Sprint 9 — Finalisasi Fitur & Keamanan ✅ SELESAI
+
+**Status:** SELESAI
+
+### Fitur yang Ditambah/Diperbaiki:
+
+1. **Materi per Kelas** — Guru memilih kelas saat upload materi; siswa hanya melihat materi kelas yang diikuti (business rule PRD)
+2. **Tandai Materi Selesai** — Siswa bisa menandai materi selesai dipelajari + penghitung progress (tabel `materials_progress`)
+3. **Jadwal Hari Ini** — Dashboard siswa menampilkan event kalender hari ini (kelas diikuti + global)
+4. **Rubrik Penilaian** — Guru menyusun rubrik per assessment (kriteria + skor maks), menilai per kriteria dengan total otomatis, siswa melihat breakdown rubrik (tabel `rubric_criteria`, kolom `submissions.rubric_scores`)
+5. **Restore RLS Aman** — RLS diaktifkan kembali (balik dari mode debug/allow-all) dengan policy per role berbasis `classrooms.guru_id`, termasuk policy guru melihat siswa & siswa melihat guru yang sebelumnya hilang
+6. **Fix Dashboard Guru** — Kartu "Modul Ajar" (angka salah) diganti "Jumlah Materi"
+7. **PRD v1.1** — Dokumen disinkronkan: Modul Ajar dihapus dari scope, tabel baru terdokumentasi, Kalender & kuis online masuk MVP
+
+### SQL Migration (jalankan di Supabase SQL Editor sesuai urutan):
+
+1. `database/migration-materials-classroom.sql`
+2. `database/migration-materials-progress.sql`
+3. `database/migration-rubric.sql`
+4. `database/restore-rls.sql` (TERAKHIR — mengaktifkan kembali RLS yang aman)
+
+---
+
 # Ringkasan Project FUSION
 
 ## Tech Stack
@@ -131,19 +154,19 @@
 - CRUD Mata Pelajaran
 - CRUD Kelas
 
-### 4. Modul Ajar & Materi (Guru)
-- Buat/Edit/Hapus Modul Ajar
-- Upload Materi (PDF, DOCX, PPT, YouTube)
+### 4. Materi (Guru)
+- Upload Materi per Kelas (PDF, DOCX, PPT, YouTube)
 - Lihat Materi
+- Siswa: tandai materi selesai dipelajari + progress pribadi
 
 ### 5. Assessment & Submission
-- Guru: Buat Assessment (Pretest, Post-test, Quiz, LKPD, Tugas) + Upload Lampiran
-- Siswa: Lihat Tugas, Upload Jawaban (PDF, DOCX, PPT, ZIP)
+- Guru: Buat Assessment (Pretest, Post-test, Quiz, LKPD, Tugas) + Upload Lampiran + Soal Kuis (pilihan ganda & isian)
+- Siswa: Lihat Tugas, Upload Jawaban (PDF, DOCX, PPT, ZIP) / Kerjakan Kuis Online (auto-score)
 - Siswa: Join Kelas via kode kelas
 
 ### 6. Penilaian
-- Guru: Lihat Submission, Beri Nilai & Feedback
-- Siswa: Lihat Nilai & Feedback
+- Guru: Lihat Submission, Beri Nilai & Feedback, Rubrik per Kriteria (total otomatis)
+- Siswa: Lihat Nilai, Feedback, & Breakdown Rubrik
 
 ### 7. Pengumuman
 - Guru: Buat/Edit/Hapus Pengumuman per Kelas
@@ -151,8 +174,12 @@
 
 ### 8. Manajemen Kelas (Role-aware)
 - Admin: CRUD Kelas lengkap
-- Guru: Lihat kelas diampu + jumlah siswa
+- Guru: Lihat kelas diampu + kelola anggota + QR code
 - Siswa: Lihat kelas diikuti + Join Kelas pakai kode
+
+### 9. Kalender Akademik
+- Admin/Guru: CRUD Event (akademik, ujian, libur, tugas, lainnya) per kelas / global
+- Siswa: Lihat event kelas diikuti + global (termasuk "Jadwal Hari Ini" di dashboard)
 
 ## Struktur Database
 
@@ -162,11 +189,15 @@
 | subjects | Mata pelajaran |
 | classrooms | Kelas |
 | classroom_members | Relasi siswa-kelas |
-| modules | Modul ajar |
-| materials | Materi pembelajaran |
+| materials | Materi pembelajaran (per kelas) |
+| materials_progress | Tandai selesai materi (siswa) |
 | assessments | Assessment/tugas |
-| submissions | Pengumpulan tugas |
+| assessment_questions | Soal kuis online |
+| student_answers | Jawaban kuis siswa |
+| rubric_criteria | Kriteria rubrik penilaian |
+| submissions | Pengumpulan tugas + nilai + rubric_scores |
 | announcements | Pengumuman |
+| calendar_events | Event kalender akademik |
 
 ## Cara Menjalankan
 
@@ -174,8 +205,18 @@
 2. Install dependencies: `npm install`
 3. Setup Supabase project
 4. Jalankan SQL schema dari `database/schema.sql`
-5. Isi `.env.local` dengan Supabase URL & Anon Key
-6. Jalankan: `npm run dev`
+5. Jalankan migration tambahan sesuai urutan:
+   - `database/migration-calendar.sql`
+   - `database/fix-assessment-questions.sql`
+   - `database/fix-student-answers.sql`
+   - `database/fix-assessment-module-id.sql`
+   - `database/fix-users-join.sql`
+   - `database/migration-materials-classroom.sql`
+   - `database/migration-materials-progress.sql`
+   - `database/migration-rubric.sql`
+   - `database/restore-rls.sql` (TERAKHIR)
+6. Isi `.env.local` dengan Supabase URL & Anon Key
+7. Jalankan: `npm run dev`
 
 ## Deploy ke Vercel
 
