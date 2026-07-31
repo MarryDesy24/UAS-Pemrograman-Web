@@ -1,0 +1,46 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="0.5" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="bgShine" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28"/>
+      <stop offset="0.45" stop-color="#FFFFFF" stop-opacity="0.02"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="205" y1="471" x2="410" y2="41" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#DBEAFE"/>
+      <stop offset="0.5" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E0E7FF"/>
+    </linearGradient>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.6 0 0 0 0 0.78 0 0 0 0 1 0 0 0 0.85 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Base squircle -->
+  <rect x="20" y="20" width="472" height="472" rx="118" fill="url(#bg)"/>
+
+  <!-- Inner ring -->
+  <rect x="48" y="48" width="416" height="416" rx="96" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="2"/>
+
+  <!-- Top-left sheen -->
+  <rect x="20" y="20" width="472" height="472" rx="118" fill="url(#bgShine)"/>
+
+  <!-- Bolt glow underneath -->
+  <g filter="url(#softGlow)">
+    <path d="M256 41 L102 256 H184 L205 471 L410 256 H328 Z" fill="url(#bolt)" stroke="#FFFFFF" stroke-opacity="0.5" stroke-width="6" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Spark accents -->
+  <circle cx="392" cy="120" r="7" fill="#FFFFFF" fill-opacity="0.85"/>
+  <circle cx="120" cy="392" r="5" fill="#FFFFFF" fill-opacity="0.6"/>
+  <path d="M402 340 L408 356 L392 350 L408 344 Z" fill="#FFFFFF" fill-opacity="0.7"/>
+</svg>

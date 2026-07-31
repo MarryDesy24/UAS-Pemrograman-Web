@@ -205,20 +205,22 @@ function JoinContent() {
       <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-transparent to-purple-600/20" />
         <div className="relative z-10 text-center px-12 space-y-8">
-          <img
-            src="/logo.png"
-            alt="FUSION Logo"
-            className="w-64 h-64 mx-auto object-contain drop-shadow-[0_0_40px_rgba(59,130,246,0.3)]"
-          />
-          <div className="space-y-3">
-            <h1 className="text-5xl font-heading font-bold text-white" style={{ textShadow: '0 0 40px rgba(59,130,246,0.4)' }}>
+          <div className="animate-bolt-in">
+            <img
+              src="/logo.svg"
+              alt="FUSION Logo"
+              className="w-64 h-64 mx-auto object-contain drop-shadow-[0_0_40px_rgba(99,102,241,0.4)] animate-float-slow"
+            />
+          </div>
+          <div className="space-y-3 animate-rise" style={{ animationDelay: '0.25s' }}>
+            <h1 className="text-5xl font-heading font-bold text-white" style={{ textShadow: '0 0 40px rgba(99,102,241,0.45)' }}>
               FUSION
             </h1>
             <p className="text-lg text-blue-300/80 tracking-wide">
               Future Oriented Industrial Simulation and Interdisciplinary Learning
             </p>
           </div>
-          <p className="text-dark-400 max-w-md mx-auto leading-relaxed">
+          <p className="text-dark-400 max-w-md mx-auto leading-relaxed animate-rise" style={{ animationDelay: '0.4s' }}>
             Platform Manajemen Pembelajaran Sekolah Terintegrasi untuk Guru, Siswa, dan Administrator
           </p>
         </div>
@@ -228,11 +230,11 @@ function JoinContent() {
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 relative z-10">
         <div className="w-full max-w-md">
           {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-8">
-            <img src="/logo.png" alt="FUSION" className="w-24 h-24 mx-auto object-contain drop-shadow-[0_0_20px_rgba(59,130,246,0.3)]" />
+          <div className="lg:hidden text-center mb-8 animate-bolt-in">
+            <img src="/logo.svg" alt="FUSION" className="w-24 h-24 mx-auto object-contain drop-shadow-[0_0_20px_rgba(99,102,241,0.4)] animate-breathe" />
           </div>
 
-          <div className="glass-card animate-slide-up">
+          <div className="glass-card animate-slide-up transition-all duration-500 hover:shadow-glow hover:border-blue-500/20">
             {/* Class Info Banner */}
             {fetchingClass ? (
               <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg text-center">

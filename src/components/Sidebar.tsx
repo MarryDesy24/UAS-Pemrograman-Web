@@ -156,9 +156,9 @@ function SidebarContent({
     <>
       {/* Logo */}
       <div className="p-4 md:p-6 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-glow">
-            <span className="text-white font-heading font-bold text-lg">F</span>
+        <div className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-glow transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-[0_0_25px_rgba(99,102,241,0.6)]">
+            <img src="/logo.svg" alt="FUSION Logo" className="w-full h-full object-cover" />
           </div>
           <div>
             <h1 className="text-xl font-heading font-bold text-white">FUSION</h1>

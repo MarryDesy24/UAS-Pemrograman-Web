@@ -21,12 +21,23 @@ export default function Home() {
 
       {/* Logo */}
       <div className={`relative transition-all duration-1000 ${phase !== 'logo' ? 'scale-110' : 'scale-100'}`}>
-        <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-        <img
-          src="/logo.png"
-          alt="FUSION Logo"
-          className="w-56 h-56 md:w-72 md:h-72 object-contain relative z-10 drop-shadow-[0_0_30px_rgba(59,130,246,0.4)]"
-        />
+        {/* Pulsing rings */}
+        <div className="absolute inset-0 rounded-full border-2 border-blue-500/40 animate-ring-pulse" />
+        <div className="absolute inset-0 rounded-full border-2 border-purple-500/30 animate-ring-pulse" style={{ animationDelay: '1.2s' }} />
+        {/* Soft glow */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/25 to-purple-500/25 rounded-full blur-3xl animate-breathe" />
+
+        <div className="relative z-10 animate-bolt-in">
+          <img
+            src="/logo.svg"
+            alt="FUSION Logo"
+            className="w-56 h-56 md:w-72 md:h-72 object-contain drop-shadow-[0_0_30px_rgba(99,102,241,0.5)]"
+          />
+          {/* Shine sweep */}
+          <div className="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
+            <div className="absolute top-0 bottom-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent animate-shine" />
+          </div>
+        </div>
       </div>
 
       {/* Walking student + loading */}
