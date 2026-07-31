@@ -13,6 +13,29 @@ interface Stats {
   totalMataPelajaran: number;
   totalAssessment: number;
   assessmentBelumDinilai: number;
+  totalMateri: number;
+}
+
+interface TodayEvent {
+  id: string;
+  title: string;
+  event_type: string;
+  classroom_nama?: string;
+}
+
+const EVENT_TYPES: Record<string, { label: string; color: string }> = {
+  academic: { label: 'Akademik', color: 'bg-blue-500' },
+  exam: { label: 'Ujian', color: 'bg-red-500' },
+  holiday: { label: 'Libur', color: 'bg-green-500' },
+  assignment: { label: 'Tugas', color: 'bg-yellow-500' },
+  other: { label: 'Lainnya', color: 'bg-purple-500' },
+};
+
+function formatDateStr(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 interface DeadlineItem {
@@ -41,6 +64,7 @@ export default function DashboardPage() {
   const [recentAnnouncements, setRecentAnnouncements] = useState<any[]>([]);
   const [deadlines, setDeadlines] = useState<DeadlineItem[]>([]);
   const [recentNilai, setRecentNilai] = useState<NilaiItem[]>([]);
+  const [todayEvents, setTodayEvents] = useState<TodayEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -63,14 +87,16 @@ export default function DashboardPage() {
             totalMataPelajaran: mp.count || 0,
             totalAssessment: 0,
             assessmentBelumDinilai: 0,
+            totalMateri: 0,
           });
         }
 
         if (currentUser?.role === 'guru') {
-          const [kelasRes, assessmentsRes, submissionsRes] = await Promise.all([
+          const [kelasRes, assessmentsRes, submissionsRes, materiRes] = await Promise.all([
             supabase.from('classrooms').select('*', { count: 'exact', head: true }).eq('guru_id', currentUser.id),
             supabase.from('assessments').select('id').order('created_at', { ascending: false }),
             supabase.from('submissions').select('id, score, assessment_id'),
+            supabase.from('materials').select('*', { count: 'exact', head: true }),
           ]);
 
           const assessmentIds = assessmentsRes.data?.map(a => a.id) || [];
@@ -81,11 +107,12 @@ export default function DashboardPage() {
 
           setStats({
             totalGuru: kelasRes.count || 0,
-            totalSiswa: assessmentIds.length,
+            totalSiswa: 0,
             totalKelas: 0,
             totalMataPelajaran: 0,
             totalAssessment: assessmentIds.length,
             assessmentBelumDinilai: belumDinilai,
+            totalMateri: materiRes.count || 0,
           });
         }
 
@@ -159,6 +186,31 @@ export default function DashboardPage() {
               }));
               setRecentNilai(enriched);
             }
+          }
+
+          // Jadwal hari ini (RLS: event global + kelas yang diikuti)
+          const { data: eventsData } = await supabase
+            .from('calendar_events')
+            .select('*')
+            .eq('event_date', formatDateStr(new Date()))
+            .order('created_at', { ascending: true });
+
+          if (eventsData && eventsData.length > 0) {
+            const eventClassroomIds = eventsData
+              .map(e => e.classroom_id)
+              .filter((id): id is string => !!id);
+            const { data: eventClassrooms } = eventClassroomIds.length > 0
+              ? await supabase.from('classrooms').select('id, nama').in('id', eventClassroomIds)
+              : { data: null };
+
+            setTodayEvents(eventsData.map(e => ({
+              id: e.id,
+              title: e.title,
+              event_type: e.event_type,
+              classroom_nama: e.classroom_id
+                ? eventClassrooms?.find(c => c.id === e.classroom_id)?.nama
+                : undefined,
+            })));
           }
         }
       } catch (error) {
@@ -389,12 +441,12 @@ export default function DashboardPage() {
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
                 <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm text-dark-400">Modul Ajar</p>
-                <p className="text-2xl font-bold text-white">{stats.totalSiswa}</p>
+                <p className="text-sm text-dark-400">Jumlah Materi</p>
+                <p className="text-2xl font-bold text-white">{stats.totalMateri}</p>
               </div>
             </div>
           </div>
@@ -454,6 +506,29 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6 animate-fade-in">
         <h1 className="text-2xl font-heading font-bold text-white">Dashboard Siswa</h1>
+
+        {/* Jadwal Hari Ini */}
+        {todayEvents.length > 0 && (
+          <div className="glass-card">
+            <h2 className="font-heading font-semibold text-white mb-4">Jadwal Hari Ini</h2>
+            <div className="space-y-3">
+              {todayEvents.map((ev) => {
+                const t = EVENT_TYPES[ev.event_type] || EVENT_TYPES.other;
+                return (
+                  <div key={ev.id} className="flex items-center gap-3 p-4 glass rounded-xl">
+                    <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${t.color}`} />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-white truncate">{ev.title}</h3>
+                      <p className="text-xs text-dark-400">
+                        {t.label}{ev.classroom_nama ? ` · ${ev.classroom_nama}` : ''}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Deadline Tugas */}
         {deadlines.length > 0 && (
@@ -516,7 +591,7 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {deadlines.length === 0 && recentNilai.length === 0 && recentAnnouncements.length === 0 && (
+        {deadlines.length === 0 && recentNilai.length === 0 && recentAnnouncements.length === 0 && todayEvents.length === 0 && (
           <div className="text-center py-16 glass-card">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/20 mb-4">
               <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
