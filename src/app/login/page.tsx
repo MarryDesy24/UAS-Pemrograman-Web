@@ -46,7 +46,7 @@ export default function LoginPage() {
         <div className="relative z-10 text-center px-12 space-y-8">
           <div className="animate-bolt-in">
             <img
-              src="/logo.svg"
+              src="/Logo sobat fusion.png"
               alt="FUSION Logo"
               className="w-64 h-64 mx-auto object-contain drop-shadow-[0_0_40px_rgba(99,102,241,0.4)] animate-float-slow"
             />
@@ -75,7 +75,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8 animate-bolt-in">
-            <img src="/logo.svg" alt="FUSION" className="w-24 h-24 mx-auto object-contain drop-shadow-[0_0_20px_rgba(99,102,241,0.4)] animate-breathe" />
+            <img src="/Logo sobat fusion.png" alt="FUSION" className="w-24 h-24 mx-auto object-contain drop-shadow-[0_0_20px_rgba(99,102,241,0.4)] animate-breathe" />
           </div>
 
           <div className="glass-card animate-slide-up transition-all duration-500 hover:shadow-glow hover:border-blue-500/20">

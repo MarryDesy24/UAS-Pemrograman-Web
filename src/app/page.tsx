@@ -29,7 +29,7 @@ export default function Home() {
 
         <div className="relative z-10 animate-bolt-in">
           <img
-            src="/logo.svg"
+            src="/Logo sobat fusion.png"
             alt="FUSION Logo"
             className="w-56 h-56 md:w-72 md:h-72 object-contain drop-shadow-[0_0_30px_rgba(99,102,241,0.5)]"
           />
