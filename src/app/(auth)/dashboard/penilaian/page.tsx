@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Submission } from '@/lib/types';
+import { Submission, RubricCriterion, RubricScore } from '@/lib/types';
 import toast from 'react-hot-toast';
 
 interface EnrichedSubmission extends Submission {
@@ -19,6 +19,9 @@ export default function PenilaianPage() {
   const [showModal, setShowModal] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState<EnrichedSubmission | null>(null);
   const [formData, setFormData] = useState({ score: 0, feedback: '' });
+  const [rubricCriteria, setRubricCriteria] = useState<RubricCriterion[]>([]);
+  const [rubricScores, setRubricScores] = useState<Record<string, number>>({});
+  const [rubricLoading, setRubricLoading] = useState(false);
 
   useEffect(() => { fetchData(); }, []);
 
@@ -103,6 +106,11 @@ export default function PenilaianPage() {
         feedback: formData.feedback,
         graded_at: new Date().toISOString(),
         graded_by: (await supabase.auth.getUser()).data.user?.id,
+        rubric_scores: rubricCriteria.map((c) => ({
+          criterion: c.criterion,
+          score: rubricScores[c.id] || 0,
+          max_score: c.max_score,
+        })),
       })
       .eq('id', selectedSubmission.id);
 
@@ -116,10 +124,34 @@ export default function PenilaianPage() {
     }
   };
 
-  const openDetailModal = (sub: EnrichedSubmission) => {
+  const openDetailModal = async (sub: EnrichedSubmission) => {
     setSelectedSubmission(sub);
     setFormData({ score: sub.score || 0, feedback: sub.feedback || '' });
+
+    setRubricLoading(true);
+    const { data } = await supabase
+      .from('rubric_criteria')
+      .select('*')
+      .eq('assessment_id', sub.assessment_id)
+      .order('order_index');
+    setRubricCriteria(data || []);
+
+    const scoreMap: Record<string, number> = {};
+    (data || []).forEach((c) => {
+      const found = (sub.rubric_scores as RubricScore[] | null)?.find((s) => s.criterion === c.criterion);
+      scoreMap[c.id] = found?.score ?? 0;
+    });
+    setRubricScores(scoreMap);
+    setRubricLoading(false);
+
     setShowModal(true);
+  };
+
+  const handleRubricScoreChange = (criterionId: string, value: number) => {
+    const next = { ...rubricScores, [criterionId]: value };
+    setRubricScores(next);
+    const total = rubricCriteria.reduce((acc, c) => acc + (next[c.id] || 0), 0);
+    setFormData((prev) => ({ ...prev, score: total }));
   };
 
   return (
@@ -200,6 +232,35 @@ export default function PenilaianPage() {
                 ))}
               </div>
             ) : <p className="text-sm text-dark-400 mb-6">Tidak ada jawaban soal</p>}
+
+            {rubricCriteria.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-white mb-3">Rubrik Penilaian</h3>
+                <div className="space-y-2">
+                  {rubricCriteria.map((c) => (
+                    <div key={c.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                      <span className="flex-1 text-sm text-dark-300">{c.criterion}</span>
+                      <input
+                        type="number"
+                        value={rubricScores[c.id] || 0}
+                        onChange={(e) => handleRubricScoreChange(c.id, Math.min(c.max_score, Math.max(0, parseInt(e.target.value) || 0)))}
+                        className="w-20 px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white text-sm text-center"
+                        min={0}
+                        max={c.max_score}
+                      />
+                      <span className="text-xs text-dark-400 w-16 text-right">/ {c.max_score}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between pt-2">
+                    <span className="text-sm text-dark-300 font-medium">Total Skor</span>
+                    <span className="text-lg font-bold text-blue-400">
+                      {rubricCriteria.reduce((acc, c) => acc + (rubricScores[c.id] || 0), 0)}
+                      <span className="text-sm font-normal text-dark-400"> / {rubricCriteria.reduce((acc, c) => acc + c.max_score, 0)}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleGrade} className="space-y-4 border-t border-white/10 pt-4">
               <div className="grid grid-cols-2 gap-4">

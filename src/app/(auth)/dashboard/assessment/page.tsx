@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Assessment, Classroom, AssessmentType, AssessmentQuestion } from '@/lib/types';
+import { Assessment, Classroom, AssessmentType, AssessmentQuestion, RubricCriterion } from '@/lib/types';
 import QuestionBuilder from '@/components/QuestionBuilder';
 import toast from 'react-hot-toast';
 
@@ -26,6 +26,10 @@ export default function AssessmentPage() {
   const [selectedAssessment, setSelectedAssessment] = useState<string | null>(null);
   const [detailQuestions, setDetailQuestions] = useState<AssessmentQuestion[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [showRubricModal, setShowRubricModal] = useState(false);
+  const [rubricAssessment, setRubricAssessment] = useState<Assessment | null>(null);
+  const [rubricCriteria, setRubricCriteria] = useState<RubricCriterion[]>([]);
+  const [rubricLoading, setRubricLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -170,6 +174,70 @@ export default function AssessmentPage() {
     setDetailLoading(false);
   };
 
+  const openRubricModal = async (a: Assessment) => {
+    setRubricAssessment(a);
+    setRubricLoading(true);
+    const { data } = await supabase
+      .from('rubric_criteria')
+      .select('*')
+      .eq('assessment_id', a.id)
+      .order('order_index');
+    setRubricCriteria(data || []);
+    setRubricLoading(false);
+    setShowRubricModal(true);
+  };
+
+  const addRubricRow = () => {
+    setRubricCriteria((prev) => [
+      ...prev,
+      {
+        id: `temp-${Date.now()}`,
+        assessment_id: rubricAssessment?.id || '',
+        criterion: '',
+        max_score: 10,
+        order_index: prev.length,
+        created_at: '',
+      },
+    ]);
+  };
+
+  const updateRubricRow = (id: string, field: 'criterion' | 'max_score', value: string | number) => {
+    setRubricCriteria((prev) => prev.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
+  };
+
+  const removeRubricRow = (id: string) => {
+    setRubricCriteria((prev) => prev.filter((c) => c.id !== id));
+  };
+
+  const saveRubric = async () => {
+    if (!rubricAssessment) return;
+    const valid = rubricCriteria.filter((c) => c.criterion.trim() !== '');
+
+    const { error: delError } = await supabase.from('rubric_criteria').delete().eq('assessment_id', rubricAssessment.id);
+    if (delError) {
+      toast.error('Gagal menyimpan rubrik');
+      return;
+    }
+
+    if (valid.length > 0) {
+      const toInsert = valid.map((c, i) => ({
+        assessment_id: rubricAssessment.id,
+        criterion: c.criterion.trim(),
+        max_score: Math.max(1, c.max_score || 0),
+        order_index: i,
+      }));
+      const { error } = await supabase.from('rubric_criteria').insert(toInsert);
+      if (error) {
+        toast.error(`Gagal menyimpan rubrik: ${error.message}`);
+        return;
+      }
+    }
+
+    toast.success('Rubrik berhasil disimpan');
+    setShowRubricModal(false);
+    setRubricAssessment(null);
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -257,6 +325,9 @@ export default function AssessmentPage() {
                     className="px-3 py-1.5 text-xs bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-colors"
                   >
                     {selectedAssessment === a.id ? 'Tutup Soal' : 'Lihat Soal'}
+                  </button>
+                  <button onClick={() => openRubricModal(a)} className="px-3 py-1.5 text-xs bg-indigo-500/20 text-indigo-400 rounded-lg hover:bg-indigo-500/30 transition-colors">
+                    Rubrik
                   </button>
                   <button onClick={() => handleEdit(a)} className="px-3 py-1.5 text-xs bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors">
                     Edit
@@ -385,6 +456,73 @@ export default function AssessmentPage() {
                 <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">{editingAssessment ? 'Update' : 'Simpan'}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Kelola Rubrik */}
+      {showRubricModal && rubricAssessment && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto">
+          <div className="glass-card w-full max-w-xl my-8 mx-4">
+            <h2 className="text-lg font-semibold mb-1">Rubrik Penilaian</h2>
+            <p className="text-sm text-dark-400 mb-4">{rubricAssessment.title}</p>
+
+            {rubricLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
+              </div>
+            ) : (
+              <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
+                {rubricCriteria.length === 0 && (
+                  <p className="text-sm text-dark-400 text-center py-4">Belum ada kriteria. Tambahkan kriteria penilaian.</p>
+                )}
+                {rubricCriteria.map((c, i) => (
+                  <div key={c.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                    <span className="text-xs font-mono bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded shrink-0">K{i + 1}</span>
+                    <input
+                      type="text"
+                      value={c.criterion}
+                      onChange={(e) => updateRubricRow(c.id, 'criterion', e.target.value)}
+                      className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white text-sm"
+                      placeholder="Nama kriteria (contoh: Kelengkapan isi)"
+                    />
+                    <div className="flex items-center gap-1 shrink-0">
+                      <input
+                        type="number"
+                        value={c.max_score}
+                        onChange={(e) => updateRubricRow(c.id, 'max_score', parseInt(e.target.value) || 0)}
+                        className="w-20 px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-white text-sm"
+                        min={1}
+                        max={100}
+                      />
+                      <span className="text-xs text-dark-400">poin</span>
+                    </div>
+                    <button onClick={() => removeRubricRow(c.id)} className="p-1.5 hover:bg-red-500/20 rounded-lg text-dark-400 hover:text-red-400 shrink-0">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+              <button
+                onClick={addRubricRow}
+                className="px-4 py-2 bg-white/5 text-white rounded-lg hover:bg-white/10 text-sm"
+              >
+                + Tambah Kriteria
+              </button>
+              <div className="flex gap-3">
+                <button onClick={() => { setShowRubricModal(false); setRubricAssessment(null); }} className="px-4 py-2 text-dark-300 hover:bg-white/10 rounded-lg">
+                  Batal
+                </button>
+                <button onClick={saveRubric} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                  Simpan Rubrik
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

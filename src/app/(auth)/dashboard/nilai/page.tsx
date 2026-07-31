@@ -125,8 +125,20 @@ export default function NilaiPage() {
                         <span className="text-sm text-gray-400">Belum dinilai</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-dark-400 max-w-xs truncate">
+                    <td className="px-6 py-4 text-sm text-dark-400 max-w-xs">
                       {sub.feedback || '-'}
+                      {sub.rubric_scores && sub.rubric_scores.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-white/10 space-y-1">
+                          {sub.rubric_scores.map((r, i) => (
+                            <div key={i} className="flex justify-between gap-3 text-xs">
+                              <span className="text-dark-400 truncate">{r.criterion}</span>
+                              <span className="font-medium text-white shrink-0">
+                                {r.score}/{r.max_score}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
