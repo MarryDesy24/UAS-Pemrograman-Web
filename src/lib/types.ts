@@ -56,12 +56,46 @@ export interface Module {
 
 export interface Material {
   id: string;
-  module_id: string;
+  module_id?: string;
+  classroom_id?: string;
   title: string;
   description?: string;
   file_type?: 'pdf' | 'docx' | 'ppt' | 'youtube';
   file_url?: string;
   youtube_url?: string;
+  created_at: string;
+}
+
+export interface MaterialProgress {
+  id: string;
+  material_id: string;
+  student_id: string;
+  completed_at: string;
+}
+
+export interface RubricCriterion {
+  id: string;
+  assessment_id: string;
+  criterion: string;
+  max_score: number;
+  order_index: number;
+  created_at: string;
+}
+
+export interface RubricScore {
+  criterion: string;
+  score: number;
+  max_score: number;
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  event_date: string;
+  event_type: 'academic' | 'exam' | 'holiday' | 'assignment' | 'other';
+  classroom_id?: string;
+  created_by: string;
   created_at: string;
 }
 
@@ -107,6 +141,16 @@ export interface Submission {
   feedback?: string;
   graded_at?: string;
   graded_by?: string;
+  rubric_scores?: RubricScore[] | null;
+}
+
+export interface StudentAnswer {
+  id: string;
+  assessment_id: string;
+  student_id: string;
+  question_id: string;
+  answer?: string;
+  created_at: string;
 }
 
 export interface Announcement {
@@ -151,20 +195,45 @@ export interface Database {
         Insert: Omit<Material, 'id' | 'created_at'>;
         Update: Partial<Omit<Material, 'id' | 'created_at'>>;
       };
+      materials_progress: {
+        Row: MaterialProgress;
+        Insert: Omit<MaterialProgress, 'id' | 'completed_at'>;
+        Update: Partial<Omit<MaterialProgress, 'id' | 'completed_at'>>;
+      };
       assessments: {
         Row: Assessment;
         Insert: Omit<Assessment, 'id' | 'created_at'>;
         Update: Partial<Omit<Assessment, 'id' | 'created_at'>>;
+      };
+      assessment_questions: {
+        Row: AssessmentQuestion;
+        Insert: Omit<AssessmentQuestion, 'id' | 'created_at'>;
+        Update: Partial<Omit<AssessmentQuestion, 'id' | 'created_at'>>;
+      };
+      rubric_criteria: {
+        Row: RubricCriterion;
+        Insert: Omit<RubricCriterion, 'id' | 'created_at'>;
+        Update: Partial<Omit<RubricCriterion, 'id' | 'created_at'>>;
       };
       submissions: {
         Row: Submission;
         Insert: Omit<Submission, 'id' | 'submitted_at'>;
         Update: Partial<Omit<Submission, 'id' | 'submitted_at'>>;
       };
+      student_answers: {
+        Row: StudentAnswer;
+        Insert: Omit<StudentAnswer, 'id' | 'created_at'>;
+        Update: Partial<Omit<StudentAnswer, 'id' | 'created_at'>>;
+      };
       announcements: {
         Row: Announcement;
         Insert: Omit<Announcement, 'id' | 'created_at'>;
         Update: Partial<Omit<Announcement, 'id' | 'created_at'>>;
+      };
+      calendar_events: {
+        Row: CalendarEvent;
+        Insert: Omit<CalendarEvent, 'id' | 'created_at'>;
+        Update: Partial<Omit<CalendarEvent, 'id' | 'created_at'>>;
       };
     };
   };
