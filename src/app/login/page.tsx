@@ -1,14 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { signIn } from '@/lib/auth';
-import { SCHOOL_CONFIG } from '@/lib/config';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,13 +17,18 @@ export default function LoginPage() {
       toast.error('Masukkan email dan password');
       return;
     }
+    if (!isSupabaseConfigured) {
+      toast.error('Konfigurasi Supabase belum diset. Periksa .env.local (lokal) atau Environment Variables di Vercel.');
+      return;
+    }
     setLoading(true);
     try {
       await signIn(email, password);
       toast.success('Berhasil masuk!');
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     } catch (error: any) {
-      toast.error(error.message || 'Email atau password salah');
+      console.error('Login error:', error);
+      toast.error(error?.message || 'Email atau password salah');
     } finally {
       setLoading(false);
     }
