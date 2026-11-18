@@ -1,19 +1,13 @@
-# PRODUCT REQUIREMENT DOCUMENT
+# Struktur PRD yang Saya Rekomendasikan
+
+```
+PRODUCT REQUIREMENT DOCUMENT
 
 FUSION
 Platform Manajemen Pembelajaran Sekolah Terintegrasi
 
-Versi 1.1 (31 Juli 2026)
-
-## Changelog v1.1
-
-* Modul Ajar dihapus dari scope (digantikan Modul Materi)
-* Kalender Akademik pindah dari "Future" ke MVP
-* Kuis online (soal pilihan ganda & isian) dengan auto-score ditambahkan
-* Materi dihubungkan ke kelas (siswa hanya melihat materi kelas yang diikuti)
-* Fitur "Tandai materi selesai dipelajari" ditambahkan
-* Rubrik penilaian ditambahkan
-* Dashboard siswa menampilkan jadwal hari ini
+Versi 1.0
+```
 
 ---
 
@@ -25,7 +19,7 @@ Perkembangan teknologi digital telah mengubah berbagai aspek kehidupan, termasuk
 
 Selain itu, pembelajaran berbasis industri pada jenjang SMK memerlukan media digital yang mampu mengintegrasikan materi pembelajaran, asesmen, serta pemantauan perkembangan belajar peserta didik secara terstruktur.
 
-Oleh karena itu dikembangkan **FUSION (Future Oriented Industrial Simulation and Interdisciplinary Learning)** sebagai Platform Manajemen Pembelajaran Sekolah Terintegrasi yang menggabungkan proses pembelajaran, asesmen digital, dan monitoring pembelajaran dalam satu aplikasi berbasis web.
+Oleh karena itu dikembangkan **FUSION (Future Unified School Integrated Online Network)** sebagai Platform Manajemen Pembelajaran Sekolah Terintegrasi yang menggabungkan proses pembelajaran, asesmen digital, dan monitoring pembelajaran dalam satu aplikasi berbasis web.
 
 ---
 
@@ -35,7 +29,7 @@ Membangun aplikasi pembelajaran berbasis web yang mampu:
 
 * memudahkan guru mengelola pembelajaran
 * memudahkan siswa mengikuti pembelajaran
-* menyediakan asesmen digital (tugas, kuis, pretest/post-test, LKPD)
+* menyediakan asesmen digital
 * mendukung pembelajaran berbasis industri
 * meningkatkan efisiensi administrasi pembelajaran
 
@@ -127,31 +121,26 @@ Mengikuti pembelajaran secara online.
 
 ✅ Mata Pelajaran
 
+✅ Modul Ajar
+
 ✅ Materi
 
-✅ Assessment (tugas, kuis, pretest/post-test, LKPD)
-
-✅ Kuis Online (soal pilihan ganda & isian + auto-score)
+✅ Assessment
 
 ✅ Submission
 
-✅ Penilaian (termasuk rubrik)
+✅ Penilaian
 
 ✅ Pengumuman
-
-✅ Kalender Akademik
-
-✅ Tandai Materi Selesai
 
 ---
 
 ## Future
 
-* Jadwal Pelajaran
-* Progress Belajar (analitik)
+* Kalender
+* Jadwal
+* Progress
 * Notifikasi
-* Riwayat Aktivitas
-* Dashboard Analitik
 
 ---
 
@@ -169,23 +158,20 @@ Mengikuti pembelajaran secara online.
 
 ## Guru
 
-* Upload Materi (per kelas)
-* Membuat Assessment (pretest, post-test, kuis, LKPD, tugas)
-* Membuat Soal Kuis
-* Membuat Rubrik Penilaian
-* Memberi Nilai & Feedback
+* Membuat Modul Ajar
+* Upload Materi
+* Membuat Assessment
+* Memberi Nilai
 * Membuat Pengumuman
-* Mengelola Anggota Kelas
-* Membuat Event Kalender
 
 ---
 
 ## Siswa
 
-* Join Kelas (kode kelas)
-* Belajar & menandai materi selesai
-* Mengerjakan Assessment (upload jawaban / kuis online)
-* Melihat Nilai & Feedback (termasuk breakdown rubrik)
+* Join Kelas
+* Belajar
+* Upload Tugas
+* Melihat Nilai
 
 ---
 
@@ -233,7 +219,7 @@ Menampilkan
 
 ### Dashboard Guru
 
-* Jumlah kelas diampu
+* Jumlah kelas
 * Jumlah materi
 * Jumlah assessment
 * Assessment belum dinilai
@@ -242,7 +228,7 @@ Menampilkan
 
 ### Dashboard Siswa
 
-* Jadwal hari ini (event kalender)
+* Jadwal hari ini
 * Deadline tugas
 * Nilai terbaru
 * Pengumuman
@@ -289,36 +275,48 @@ Tahun ajaran
 
 Siswa bergabung menggunakan kode kelas.
 
-Guru dapat mengelola anggota kelas (tambah/keluarkan siswa) dan menampilkan QR code kelas.
-
 ---
 
-## Modul Materi
+## Modul Modul Ajar
 
-Materi diunggah oleh guru dan dihubungkan ke kelas tertentu. Siswa hanya dapat melihat materi kelas yang diikuti.
+Ini menjadi fitur utama FUSION.
 
-Jenis
-
-* PDF
-* DOCX
-* PPT
-* Video Youtube
-
-Field
+Guru membuat
 
 ```
 Judul
 
 Deskripsi
 
-Jenis file
+Tujuan Pembelajaran
 
-File / URL Youtube
+Kompetensi Awal
 
-Kelas
+Materi Pokok
+
+Pertanyaan Pemantik
+
+Referensi
+
+Video Youtube
+
+Dokumen
+
 ```
 
-Siswa dapat menandai materi sebagai "selesai dipelajari" (tracking progress pribadi).
+---
+
+## Modul Materi
+
+Jenis
+
+PDF
+
+DOCX
+
+PPT
+
+Video Youtube
 
 ---
 
@@ -344,13 +342,7 @@ Deadline
 Nilai Maksimum
 
 Lampiran
-
-Kelas
 ```
-
-Kuis online mendukung soal pilihan ganda (dengan kunci jawaban, auto-score) dan soal isian (dinilai guru).
-
-Guru dapat menyusun rubrik penilaian per assessment (kriteria + skor maksimum per kriteria).
 
 ---
 
@@ -364,8 +356,6 @@ Upload
 * DOCX
 * PPT
 * ZIP
-
-atau mengerjakan kuis online langsung di aplikasi.
 
 Guru
 
@@ -387,8 +377,6 @@ Guru memberikan
 Nilai
 
 Feedback
-
-Skor per kriteria rubrik (total otomatis)
 ```
 
 Siswa melihat
@@ -397,8 +385,6 @@ Siswa melihat
 Nilai
 
 Feedback
-
-Breakdown rubrik per kriteria
 ```
 
 ---
@@ -417,20 +403,6 @@ Tanggal
 
 ---
 
-## Modul Kalender Akademik
-
-Admin dan Guru dapat membuat event:
-
-* Akademik
-* Ujian
-* Libur
-* Tugas
-* Lainnya
-
-Event dapat dikaitkan ke kelas tertentu atau berlaku global (semua kelas). Siswa melihat event kelas yang diikuti + event global.
-
----
-
 # BAB 7 Database
 
 ## users
@@ -444,23 +416,7 @@ email
 
 role
 
-avatar_url
-
 created_at
-```
-
----
-
-## subjects
-
-```
-id
-
-nama
-
-kode
-
-deskripsi
 ```
 
 ---
@@ -476,8 +432,6 @@ kode
 
 guru_id
 
-subject_id
-
 semester
 
 tahun_ajaran
@@ -485,16 +439,40 @@ tahun_ajaran
 
 ---
 
-## classroom_members
+## subjects
 
 ```
 id
 
-classroom_id
+nama
 
-student_id
+kode
+```
 
-joined_at
+---
+
+## modules
+
+```
+id
+
+subject_id
+
+teacher_id
+
+title
+
+description
+
+learning_objectives
+
+prerequisite
+
+references
+
+youtube_url
+
+created_at
 ```
 
 ---
@@ -504,33 +482,13 @@ joined_at
 ```
 id
 
-classroom_id
+module_id
 
 title
-
-description
-
-file_type
 
 file_url
 
 youtube_url
-
-created_at
-```
-
----
-
-## materials_progress
-
-```
-id
-
-material_id
-
-student_id
-
-completed_at
 ```
 
 ---
@@ -540,59 +498,15 @@ completed_at
 ```
 id
 
-classroom_id
+module_id
 
 type
 
 title
 
-description
-
 deadline
 
 max_score
-
-attachment_url
-```
-
----
-
-## assessment_questions
-
-```
-id
-
-assessment_id
-
-question_text
-
-question_type
-
-options
-
-correct_answer
-
-media_url
-
-media_type
-
-order_index
-```
-
----
-
-## rubric_criteria
-
-```
-id
-
-assessment_id
-
-criterion
-
-max_score
-
-order_index
 ```
 
 ---
@@ -613,28 +527,6 @@ submitted_at
 score
 
 feedback
-
-graded_at
-
-graded_by
-
-rubric_scores
-```
-
----
-
-## student_answers
-
-```
-id
-
-assessment_id
-
-student_id
-
-question_id
-
-answer
 ```
 
 ---
@@ -646,31 +538,9 @@ id
 
 classroom_id
 
-teacher_id
-
 title
 
 content
-```
-
----
-
-## calendar_events
-
-```
-id
-
-title
-
-description
-
-event_date
-
-event_type
-
-classroom_id
-
-created_by
 ```
 
 ---
@@ -715,8 +585,6 @@ Guru hanya dapat melihat kelas yang diajar.
 
 Siswa hanya boleh melihat kelas yang diikuti.
 
-Siswa hanya dapat melihat materi dan assessment kelas yang diikuti (materi global tanpa kelas tetap dapat dilihat semua siswa).
-
 Assessment tidak bisa dikumpulkan setelah deadline.
 
 Nilai maksimal 100.
@@ -727,11 +595,9 @@ Satu guru dapat memiliki banyak kelas.
 
 Satu kelas memiliki banyak siswa.
 
-Satu assessment dapat memiliki banyak soal.
+Satu modul ajar dapat memiliki banyak materi.
 
-Satu assessment dapat memiliki banyak kriteria rubrik.
-
-Siswa hanya dapat menandai/menghapus tandai selesai untuk progress miliknya sendiri.
+Satu modul ajar dapat memiliki banyak assessment.
 
 ---
 
@@ -769,58 +635,71 @@ GitHub
 
 # BAB 11 Roadmap
 
-## Versi 1 (Selesai)
+## Versi 1
 
 * Login
-* Dashboard per role
-* Kelas (join kode + kelola anggota)
-* Mata Pelajaran
-* Materi per kelas + tandai selesai
-* Assessment (tugas, kuis online, pretest/post-test, LKPD)
-* Penilaian (rubrik + auto-score)
-* Pengumuman
-* Kalender Akademik
+* Dashboard
+* Kelas
+* Modul Ajar
+* Materi
+* Assessment
+* Penilaian
 
 ---
 
 ## Versi 2
 
+* Kalender Akademik
 * Jadwal Pelajaran
-* Progress Belajar (analitik per siswa)
+* Progress Belajar
 * Notifikasi
 * Riwayat Aktivitas
 * Dashboard Analitik
 
 ---
 
-# Hak Akses Per Halaman
+
+
+# Berikut revisi aktivitasnya 
 
 | **Halaman**           | **Admin**                                                      | **Guru**                                                                          | **Siswa**                                                              |
 | --------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| **Dashboard**         | Statistik sekolah, jumlah guru, siswa, kelas, mata pelajaran   | Ringkasan kelas, jumlah materi, assessment belum dinilai                          | Jadwal hari ini, deadline, nilai terbaru, pengumuman                    |
-| **Guru**              | CRUD Guru                                                      | Lihat & ubah profil sendiri                                                       | -                                                                      |
-| **Siswa**             | CRUD Siswa                                                     | Lihat daftar siswa di kelas yang diampu                                           | Lihat & ubah profil sendiri                                            |
-| **Kelas**             | CRUD Kelas                                                     | Lihat kelas yang diampu, kelola anggota kelas, QR code                            | Lihat kelas yang diikuti, Join menggunakan kode kelas                  |
-| **Mata Pelajaran**    | CRUD seluruh mata pelajaran                                    | CRUD mata pelajaran yang diampu                                                   | Lihat mata pelajaran yang diikuti                                      |
-| **Materi**            | Monitoring materi                                              | CRUD materi (PDF, PPT, DOC, YouTube) per kelas                                    | Lihat, unduh, tonton video, tandai selesai dipelajari                  |
-| **Assessment**        | Monitoring assessment                                          | CRUD Assessment (Pretest, Post-test, Kuis, LKPD, Tugas), soal kuis, rubrik        | Mengerjakan assessment (upload / kuis online)                          |
-| **Submission**        | Monitoring pengumpulan                                         | Lihat seluruh submission, download jawaban, beri komentar                         | Upload jawaban, kerjakan kuis, lihat status pengumpulan                |
-| **Penilaian**         | Monitoring nilai                                               | Beri nilai, feedback, skor rubrik per kriteria                                    | Lihat nilai, feedback, dan breakdown rubrik                            |
-| **Kalender Akademik** | CRUD Kalender Akademik                                         | Tambah event kelas / global                                                       | Lihat jadwal dan event kelas yang diikuti                              |
-| **Pengumuman**        | Monitoring pengumuman                                          | CRUD Pengumuman Kelas                                                             | Lihat pengumuman                                                       |
+| **Dashboard**         | Statistik sekolah, jumlah guru, siswa, kelas, aktivitas sistem | Ringkasan kelas, progress pembelajaran, assessment belum dinilai, aktivitas siswa | Jadwal hari ini, progress belajar, deadline, nilai terbaru, pengumuman |
+| **Guru**              | CRUD Guru, Reset Password                                      | Lihat & ubah profil sendiri                                                       | -                                                                      |
+| **Siswa**             | CRUD Siswa, Reset Password                                     | Lihat daftar siswa di kelas yang diampu                                           | Lihat & ubah profil sendiri                                            |
+| **Kelas**             | CRUD Kelas                                                     | Lihat kelas yang diampu, kelola anggota kelas                                     | Lihat kelas yang diikuti, Join menggunakan kode kelas                  |
+| **Mata Pelajaran**    | CRUD seluruh mata pelajaran                                    | **CRUD mata pelajaran yang diampu**                                               | Lihat mata pelajaran yang diikuti                                      |
+| **Modul Ajar**        | Monitoring seluruh modul ajar                                  | CRUD Modul Ajar, susun urutan pembelajaran, publish/unpublish                     | Lihat modul ajar yang dipublikasikan                                   |
+| **Materi**            | Monitoring materi                                              | CRUD materi (PDF, PPT, DOC, YouTube)                                              | Lihat, unduh, tonton video, tandai selesai dipelajari                  |
+| **Assessment**        | Monitoring assessment                                          | CRUD Assessment (Pretest, Post-test, Kuis, LKPD, Tugas), atur deadline & lampiran | Mengerjakan assessment                                                 |
+| **Submission**        | Monitoring pengumpulan                                         | Lihat seluruh submission, download jawaban, beri komentar                         | Upload jawaban, edit sebelum deadline, lihat status pengumpulan        |
+| **Penilaian**         | Monitoring nilai                                               | Beri nilai, feedback, rubrik, publish nilai                                       | Lihat nilai dan feedback                                               |
+| **Progress Belajar**  | Monitoring seluruh kelas                                       | Monitoring progress tiap siswa                                                    | Lihat progress belajar pribadi                                         |
+| **Kalender Akademik** | CRUD Kalender Akademik                                         | Lihat agenda mengajar, tambah agenda kelas                                        | Lihat jadwal pembelajaran dan deadline                                 |
+| **Jadwal Pelajaran**  | CRUD Jadwal                                                    | Lihat jadwal mengajar                                                             | Lihat jadwal belajar                                                   |
+| **Pengumuman**        | CRUD Pengumuman Sekolah                                        | CRUD Pengumuman Kelas                                                             | Lihat pengumuman                                                       |
+| **Notifikasi**        | Monitoring                                                     | Menerima notifikasi aktivitas kelas                                               | Menerima notifikasi materi baru, deadline, dan nilai                   |
+| **Statistik**         | Statistik sekolah                                              | Statistik kelas (rata-rata nilai, progres belajar, tingkat penyelesaian tugas)    | Statistik pribadi (nilai rata-rata, materi selesai, tugas selesai)     |
 
----
+### Catatan Business Rule
 
-# Rekomendasi Pengembangan (sudah diimplementasikan)
+Agar tidak terjadi konflik data, saya menyarankan aturan berikut:
 
-Implementasi dilakukan secara bertahap dengan urutan:
+* **Admin** dapat melakukan CRUD terhadap **seluruh** mata pelajaran.
+* **Guru** hanya dapat melakukan CRUD terhadap **mata pelajaran yang dibuat atau diampunya**.
+* **Siswa** hanya dapat melihat mata pelajaran yang telah terdaftar pada kelas yang diikutinya.
 
-1. **Autentikasi & Hak Akses** (Admin, Guru, Siswa) — selesai.
-2. **Manajemen Data Master** (Kelas, Mata Pelajaran, Pengguna) — selesai.
-3. **Materi** (inti dari FUSION, per kelas) — selesai.
-4. **Assessment & Submission** (pretest, post-test, kuis online, LKPD, tugas) — selesai.
-5. **Penilaian** (rubrik, auto-score, feedback) & Dashboard — selesai.
-6. **Pengumuman** — selesai.
-7. **Kalender Akademik** — selesai.
+Dengan aturan ini, aplikasi tetap fleksibel untuk demonstrasi dan pengembangan, tetapi hak akses setiap peran tetap jelas dan aman.
 
-Fitur lanjutan (Versi 2): jadwal pelajaran, progress belajar analitik, notifikasi, riwayat aktivitas, dashboard analitik.
+
+# Rekomendasi Pengembangan
+
+Melihat keseluruhan kebutuhan proyek Anda (UAS sekaligus LIDM), saya menyarankan agar implementasi dilakukan secara bertahap dengan urutan berikut:
+
+1. **Autentikasi & Hak Akses** (Admin, Guru, Siswa).
+2. **Manajemen Data Master** (Kelas, Mata Pelajaran, Pengguna).
+3. **Modul Ajar & Materi** (inti dari FUSION).
+4. **Assessment & Submission** (pretest, post-test, kuis, LKPD, tugas).
+5. **Penilaian & Dashboard**.
+
+7. **Fitur unggulan** seperti kalender, progress belajar, dan dashboard analitik.

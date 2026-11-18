@@ -63,10 +63,14 @@ export default function Header({ user }: HeaderProps) {
             onClick={() => setShowDropdown(!showDropdown)}
             className="flex items-center gap-2 px-2 md:px-3 py-2 text-sm text-dark-300 hover:bg-white/5 rounded-xl transition-all duration-300 border border-transparent hover:border-white/10"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shrink-0">
-              <span className="text-white font-medium text-sm">
-                {user.nama.charAt(0).toUpperCase()}
-              </span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shrink-0 overflow-hidden">
+              {user.avatar_url ? (
+                <img src={user.avatar_url} alt={user.nama} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-white font-medium text-sm">
+                  {user.nama.charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
             <span className="hidden sm:inline text-white text-sm truncate max-w-[100px]">{user.nama}</span>
             <svg
@@ -85,6 +89,18 @@ export default function Header({ user }: HeaderProps) {
                 <p className="text-sm font-medium text-white">{user.nama}</p>
                 <p className="text-xs text-dark-400 truncate">{user.email}</p>
               </div>
+              <button
+                onClick={() => {
+                  setShowDropdown(false);
+                  router.push('/dashboard/profil');
+                }}
+                className="w-full px-4 py-3 text-left text-sm text-dark-300 hover:bg-white/5 hover:text-white flex items-center gap-3 transition-all duration-200"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Profil Saya
+              </button>
               <button
                 onClick={() => {
                   setShowDropdown(false);

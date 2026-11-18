@@ -217,7 +217,7 @@ function JoinContent() {
               FUSION
             </h1>
             <p className="text-lg text-blue-300/80 tracking-wide">
-              Future Oriented Industrial Simulation and Interdisciplinary Learning
+              Future-Oriented Unified System for Education
             </p>
           </div>
           <p className="text-dark-400 max-w-md mx-auto leading-relaxed animate-rise" style={{ animationDelay: '0.4s' }}>

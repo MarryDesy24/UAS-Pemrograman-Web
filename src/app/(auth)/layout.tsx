@@ -10,7 +10,8 @@ import { User } from '@/lib/types';
 export const SidebarContext = createContext<{
   open: boolean;
   setOpen: (v: boolean) => void;
-}>({ open: false, setOpen: () => {} });
+  refreshUser: () => Promise<void>;
+}>({ open: false, setOpen: () => {}, refreshUser: async () => {} });
 
 export function useSidebar() {
   return useContext(SidebarContext);
@@ -55,8 +56,13 @@ export default function DashboardLayout({
 
   if (!user) return null;
 
+  const refreshUser = async () => {
+    const currentUser = await getCurrentUser();
+    if (currentUser) setUser(currentUser);
+  };
+
   return (
-    <SidebarContext.Provider value={{ open: sidebarOpen, setOpen: setSidebarOpen }}>
+    <SidebarContext.Provider value={{ open: sidebarOpen, setOpen: setSidebarOpen, refreshUser }}>
       <div className="min-h-screen bg-dark-900 bg-mesh flex">
         <Sidebar user={user} />
         {sidebarOpen && (

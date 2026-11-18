@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { supabase } from '@/lib/supabase';
 
 export default function AdminRegisterPage() {
   const router = useRouter();
@@ -13,37 +12,22 @@ export default function AdminRegisterPage() {
   const [secretKey, setSecretKey] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const VALID_SECRET_KEY = 'FUSION-ADMIN-2024';
-
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (secretKey !== VALID_SECRET_KEY) {
-      toast.error('Kode rahasia salah');
-      return;
-    }
 
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { nama, role: 'admin' },
-        },
+      const res = await fetch('/api/admin/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nama, email, password, secretKey }),
       });
 
-      if (error) throw error;
+      const result = await res.json();
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.from('users').upsert({
-          id: user.id,
-          nama,
-          email,
-          role: 'admin',
-        });
+      if (!res.ok) {
+        throw new Error(result.error || 'Gagal mendaftar');
       }
 
       toast.success('Akun admin berhasil dibuat!');

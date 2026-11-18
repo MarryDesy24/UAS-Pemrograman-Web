@@ -9,6 +9,7 @@ interface SidebarProps {
   user: {
     role: UserRole;
     nama: string;
+    avatar_url?: string;
   };
 }
 
@@ -18,7 +19,18 @@ const adminMenu = [
   { name: 'Siswa', href: '/dashboard/siswa', icon: 'users' },
   { name: 'Kelas', href: '/dashboard/kelas', icon: 'academic' },
   { name: 'Mata Pelajaran', href: '/dashboard/mata-pelajaran', icon: 'book' },
+  { name: 'Pengumuman', href: '/dashboard/pengumuman', icon: 'megaphone' },
   { name: 'Kalender', href: '/dashboard/kalender', icon: 'calendar' },
+  { name: 'Monitor Assessment', href: '/dashboard/monitoring/assessment', icon: 'clipboard' },
+  { name: 'Monitor Submission', href: '/dashboard/monitoring/submission', icon: 'document' },
+  { name: 'Monitor Nilai', href: '/dashboard/monitoring/nilai', icon: 'star' },
+  { name: 'Monitor Materi', href: '/dashboard/monitoring/materi', icon: 'folder' },
+  { name: 'Jadwal Pelajaran', href: '/dashboard/jadwal', icon: 'clock' },
+  { name: 'Progress Belajar', href: '/dashboard/progress', icon: 'chart' },
+  { name: 'Statistik', href: '/dashboard/statistik', icon: 'chart' },
+  { name: 'Notifikasi', href: '/dashboard/notifikasi', icon: 'bell' },
+  { name: 'Riwayat Aktivitas', href: '/dashboard/aktivitas', icon: 'history' },
+  { name: 'Profil', href: '/dashboard/profil', icon: 'user' },
 ];
 
 const guruMenu = [
@@ -29,6 +41,12 @@ const guruMenu = [
   { name: 'Penilaian', href: '/dashboard/penilaian', icon: 'star' },
   { name: 'Pengumuman', href: '/dashboard/pengumuman', icon: 'megaphone' },
   { name: 'Kalender', href: '/dashboard/kalender', icon: 'calendar' },
+  { name: 'Jadwal Pelajaran', href: '/dashboard/jadwal', icon: 'clock' },
+  { name: 'Progress Belajar', href: '/dashboard/progress', icon: 'chart' },
+  { name: 'Statistik', href: '/dashboard/statistik', icon: 'chart' },
+  { name: 'Notifikasi', href: '/dashboard/notifikasi', icon: 'bell' },
+  { name: 'Riwayat Aktivitas', href: '/dashboard/aktivitas', icon: 'history' },
+  { name: 'Profil', href: '/dashboard/profil', icon: 'user' },
 ];
 
 const siswaMenu = [
@@ -39,6 +57,11 @@ const siswaMenu = [
   { name: 'Nilai', href: '/dashboard/nilai', icon: 'star' },
   { name: 'Pengumuman', href: '/dashboard/pengumuman', icon: 'megaphone' },
   { name: 'Kalender', href: '/dashboard/kalender', icon: 'calendar' },
+  { name: 'Jadwal Pelajaran', href: '/dashboard/jadwal', icon: 'clock' },
+  { name: 'Progress Belajar', href: '/dashboard/progress', icon: 'chart' },
+  { name: 'Statistik', href: '/dashboard/statistik', icon: 'chart' },
+  { name: 'Notifikasi', href: '/dashboard/notifikasi', icon: 'bell' },
+  { name: 'Profil', href: '/dashboard/profil', icon: 'user' },
 ];
 
 function getMenuByRole(role: UserRole) {
@@ -112,6 +135,36 @@ function getIcon(iconName: string) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       );
+    case 'clock':
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    case 'chart':
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      );
+    case 'bell':
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+      );
+    case 'history':
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    case 'user':
+      return (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -147,7 +200,7 @@ function SidebarContent({
   pathname,
   onNavClick,
 }: {
-  user: { role: UserRole; nama: string };
+  user: { role: UserRole; nama: string; avatar_url?: string };
   menu: { name: string; href: string; icon: string }[];
   pathname: string;
   onNavClick?: () => void;
@@ -197,10 +250,14 @@ function SidebarContent({
       {/* User Profile */}
       <div className="p-3 md:p-4 border-t border-white/10">
         <div className="flex items-center gap-3 px-4 py-3 glass rounded-xl">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shrink-0">
-            <span className="text-white font-semibold text-sm">
-              {user.nama.charAt(0).toUpperCase()}
-            </span>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shrink-0 overflow-hidden">
+            {user.avatar_url ? (
+              <img src={user.avatar_url} alt={user.nama} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-white font-semibold text-sm">
+                {user.nama.charAt(0).toUpperCase()}
+              </span>
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-white truncate">{user.nama}</p>

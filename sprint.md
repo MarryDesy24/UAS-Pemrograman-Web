@@ -196,8 +196,11 @@
 | student_answers | Jawaban kuis siswa |
 | rubric_criteria | Kriteria rubrik penilaian |
 | submissions | Pengumpulan tugas + nilai + rubric_scores |
-| announcements | Pengumuman |
+| announcements | Pengumuman kelas / sekolah |
 | calendar_events | Event kalender akademik |
+| schedules | Jadwal pelajaran |
+| notifications | Notifikasi pengguna |
+| activity_logs | Riwayat aktivitas |
 
 ## Cara Menjalankan
 
@@ -214,6 +217,8 @@
    - `database/migration-materials-classroom.sql`
    - `database/migration-materials-progress.sql`
    - `database/migration-rubric.sql`
+   - `database/migration-server-rules.sql`
+   - `database/migration-v2.sql`
    - `database/restore-rls.sql` (TERAKHIR)
 6. Isi `.env.local` dengan Supabase URL & Anon Key
 7. Jalankan: `npm run dev`
@@ -224,3 +229,46 @@
 2. Import project di Vercel
 3. Tambahkan environment variables
 4. Deploy
+
+---
+
+# Sprint 10 — Perbaikan Alur Kritis & Business Rules ✅ SELESAI
+
+**Status:** SELESAI
+
+### Fitur yang Ditambah/Diperbaiki:
+
+1. **Halaman `/reset-password`** — Menyelesaikan alur lupa password (verifikasi sesi recovery, form password baru, redirect login).
+2. **Secret Admin Server-side** — Registrasi admin lewat `POST /api/admin/register`; secret dibaca dari `ADMIN_REGISTER_SECRET` dan pembuatan user memakai `SUPABASE_SERVICE_ROLE_KEY` (tidak terekspos ke client).
+3. **Business Rule di Database** — Migration `migration-server-rules.sql`:
+   - Trigger deadline submission + batas nilai (0..max_score/100)
+   - Siswa tidak bisa mengubah nilai/feedback assessment manual
+   - `subjects.owner_id` + RLS mapel per guru
+   - Pengumuman sekolah (`announcements.classroom_id` nullable) + RLS admin
+   - Proteksi eskalasi role user
+4. **Scope Mapel Guru** — Halaman mata pelajaran menampilkan guru pengampu, guru hanya dapat CRUD mapel miliknya.
+5. **Pengumuman Sekolah** — Admin dapat CRUD pengumuman sekolah (semua kelas); siswa melihat pengumuman sekolah + kelas yang diikuti.
+6. **Profil Pengguna** — Halaman `/dashboard/profil` untuk lihat/ubah nama + foto profil, semua role.
+
+---
+
+# Sprint 11 — Monitoring Admin & Fitur Versi 2 ✅ SELESAI
+
+**Status:** SELESAI
+
+### Fitur yang Ditambah:
+
+1. **Monitoring Admin (read-only)** — `/dashboard/monitoring/{assessment,submission,nilai,materi}`.
+2. **Jadwal Pelajaran** — `/dashboard/jadwal`, CRUD admin/guru, siswa melihat jadwal kelas + global.
+3. **Progress Belajar** — `/dashboard/progress`, progress materi & pengumpulan tugas per kelas (admin/guru/siswa).
+4. **Notifikasi** — `/dashboard/notifikasi`, notifikasi otomatis dari trigger pengumuman, materi, assessment, dan nilai.
+5. **Statistik** — `/dashboard/statistik`, ringkasan angka per role.
+6. **Riwayat Aktivitas** — `/dashboard/aktivitas`, log otomatis aktivitas pengumuman/materi/assessment/penilaian.
+7. **Database** — `schema.sql` menjadi satu sumber kebenaran, `migration-v2.sql`, serta dokumentasi di `database/README.md`.
+8. **Environment** — `.env.example` mencantumkan variabel server-only yang dibutuhkan.
+
+### SQL Migration Tambahan (urutan setelah migration-rubric.sql):
+
+1. `database/migration-server-rules.sql`
+2. `database/migration-v2.sql`
+3. `database/restore-rls.sql` (TERAKHIR, hanya untuk database lama)

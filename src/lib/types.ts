@@ -15,6 +15,7 @@ export interface Subject {
   nama: string;
   kode: string;
   deskripsi?: string;
+  owner_id?: string | null;
   created_at: string;
 }
 
@@ -155,10 +156,45 @@ export interface StudentAnswer {
 
 export interface Announcement {
   id: string;
-  classroom_id: string;
+  classroom_id: string | null;
   teacher_id: string;
   title: string;
   content: string;
+  created_at: string;
+}
+
+export interface Schedule {
+  id: string;
+  classroom_id: string | null;
+  subject_id?: string | null;
+  teacher_id?: string | null;
+  title: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  room?: string | null;
+  created_by: string;
+  created_at: string;
+}
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: 'announcement' | 'material' | 'assessment' | 'grade' | 'info';
+  link?: string | null;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface ActivityLog {
+  id: string;
+  actor_id: string;
+  action: string;
+  entity_type: string;
+  entity_id?: string | null;
+  description: string;
   created_at: string;
 }
 
@@ -234,6 +270,21 @@ export interface Database {
         Row: CalendarEvent;
         Insert: Omit<CalendarEvent, 'id' | 'created_at'>;
         Update: Partial<Omit<CalendarEvent, 'id' | 'created_at'>>;
+      };
+      schedules: {
+        Row: Schedule;
+        Insert: Omit<Schedule, 'id' | 'created_at'>;
+        Update: Partial<Omit<Schedule, 'id' | 'created_at'>>;
+      };
+      notifications: {
+        Row: Notification;
+        Insert: Omit<Notification, 'id' | 'created_at'>;
+        Update: Partial<Omit<Notification, 'id' | 'created_at'>>;
+      };
+      activity_logs: {
+        Row: ActivityLog;
+        Insert: Omit<ActivityLog, 'id' | 'created_at'>;
+        Update: Partial<Omit<ActivityLog, 'id' | 'created_at'>>;
       };
     };
   };

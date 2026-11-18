@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Poster FUSION LMS — A3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=League+Spartan:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page { size: A3 portrait; margin: 0; }
+
+  html, body {
+    background: #1e1b4b;
+    font-family: 'Inter', sans-serif;
+    color: #ffffff;
+  }
+
+  /* ====== Poster: background full color ====== */
+  .poster {
+    width: 297mm;
+    height: 420mm;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(150deg, #1d4ed8 0%, #6d28d9 28%, #a21caf 52%, #db2777 76%, #f97316 100%);
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .orb-1 { width: 120mm; height: 120mm; background: #fde047; top: -20mm; left: -25mm; }
+  .orb-2 { width: 100mm; height: 100mm; background: #22d3ee; top: 130mm; right: -35mm; }
+  .orb-3 { width: 90mm; height: 90mm; background: #4ade80; bottom: 90mm; left: -30mm; }
+  .orb-4 { width: 110mm; height: 110mm; background: #f472b6; bottom: -30mm; right: 40mm; }
+
+  /* ====== Glass card versi warna (frosted glass) ====== */
+  .glass {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(70, 20, 140, 0.35);
+  }
+
+  .glass-card:hover { background: rgba(255, 255, 255, 0.17); }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #ffffff 0%, #fde68a 55%, #fda4af 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 24px rgba(255, 235, 150, 0.45));
+  }
+
+  .muted { color: rgba(255, 255, 255, 0.8); }
+
+  /* ====== Poster inner ====== */
+  .poster-inner {
+    position: relative;
+    height: 100%;
+    padding: 12mm 14mm 10mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* ====== Header ====== */
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 18px;
+    border-radius: 16px;
+  }
+
+  .brand { display: flex; align-items: center; gap: 12px; }
+
+  .brand img {
+    height: 12mm;
+    width: 12mm;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 0 24px rgba(255, 255, 255, 0.55);
+  }
+
+  .brand h1 {
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 700;
+    font-size: 20pt;
+    color: #ffffff;
+    line-height: 1;
+    text-shadow: 0 0 18px rgba(255, 255, 255, 0.45);
+  }
+
+  .brand p {
+    font-size: 8pt;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 9.5pt;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .pill .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fde047;
+    box-shadow: 0 0 8px #fde047;
+  }
+
+  /* ====== Hero ====== */
+  .hero { text-align: center; padding: 6mm 4mm 4mm; }
+
+  .hero h1 {
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 800;
+    font-size: 46pt;
+    line-height: 1;
+    letter-spacing: 4px;
+  }
+
+  .hero .full-name {
+    font-size: 9.5pt;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 5mm;
+  }
+
+  .hero .tagline {
+    font-size: 14pt;
+    font-weight: 600;
+    color: #ffffff;
+    margin-top: 6mm;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .hero .sub {
+    font-size: 9pt;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 4mm;
+  }
+
+  .hero .sub strong { color: #fde68a; font-weight: 700; }
+
+  .chips { margin-top: 6mm; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+
+  .chip {
+    padding: 4px 15px;
+    border-radius: 999px;
+    font-size: 8.5pt;
+    font-weight: 700;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .chip.c-blue   { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .chip.c-purple { background: linear-gradient(135deg, #a855f7, #6d28d9); }
+  .chip.c-green  { background: linear-gradient(135deg, #22c55e, #15803d); }
+  .chip.c-orange { background: linear-gradient(135deg, #f97316, #ea580c); }
+
+  /* ====== Mockup dashboard (tetap tampilan gelap aplikasi) ====== */
+  .mockup {
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 16px 50px rgba(30, 10, 90, 0.5), 0 0 0 3px rgba(255, 255, 255, 0.25);
+  }
+
+  .mockup-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .mockup-top .url {
+    font-size: 7.5pt;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 3px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .mockup-top .url svg { width: 3.5mm; height: 3.5mm; color: #22c55e; }
+
+  .mockup-body { display: flex; background: #0f172a; }
+
+  .mockup-sidebar {
+    width: 32%;
+    background: rgba(255, 255, 255, 0.08);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 10px;
+  }
+
+  .ms-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 8px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 7px;
+  }
+
+  .ms-logo img {
+    width: 9mm;
+    height: 9mm;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+
+  .ms-logo h4 {
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 700;
+    font-size: 11pt;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .ms-logo span { font-size: 6.5pt; color: #94a3b8; text-transform: capitalize; }
+
+  .ms-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 8pt;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .ms-item svg { width: 4mm; height: 4mm; flex-shrink: 0; }
+
+  .ms-item.active {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  .ms-item.active .ms-dot {
+    margin-left: auto;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #60a5fa;
+  }
+
+  .ms-item:not(.active) { color: #cbd5e1; }
+
+  .mockup-main {
+    flex: 1;
+    padding: 9px 12px;
+    background-image: radial-gradient(at 40% 20%, rgba(59, 130, 246, 0.12) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgba(249, 115, 22, 0.07) 0px, transparent 50%),
+      radial-gradient(at 0% 80%, rgba(99, 102, 241, 0.08) 0px, transparent 50%);
+  }
+
+  .ms-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 7px;
+    margin-bottom: 7px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .ms-header h5 {
+    font-family: 'League Spartan', sans-serif;
+    font-size: 11pt;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .ms-header p { font-size: 7pt; color: #94a3b8; }
+
+  .ms-avatar {
+    width: 8mm;
+    height: 8mm;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 9pt;
+  }
+
+  .ms-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+
+  .ms-stat {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 6px 8px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+
+  .ms-stat .ic {
+    width: 7mm;
+    height: 7mm;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 3px;
+  }
+
+  .ms-stat .ic svg { width: 3.8mm; height: 3.8mm; }
+
+  .ms-stat .num {
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 700;
+    font-size: 13pt;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .ms-stat .lbl { font-size: 6.5pt; color: #94a3b8; margin-top: 2px; }
+
+  .mockup-caption {
+    text-align: center;
+    font-size: 7.5pt;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 5px;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ====== Section title ====== */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 700;
+    font-size: 14pt;
+    color: #ffffff;
+    margin: 8mm 0 3.5mm;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .section-title .st-dot {
+    width: 7mm;
+    height: 7mm;
+    border-radius: 8px;
+    flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.35);
+  }
+
+  .st-dot.d-blue   { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+  .st-dot.d-purple { background: linear-gradient(135deg, #c084fc, #7c3aed); }
+  .st-dot.d-pink   { background: linear-gradient(135deg, #f472b6, #db2777); }
+  .st-dot.d-orange { background: linear-gradient(135deg, #fb923c, #ea580c); }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.05));
+  }
+
+  /* ====== Fitur utama ====== */
+  .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; }
+
+  .feature-card {
+    border-radius: 16px;
+    padding: 4.5mm 4mm;
+    display: flex;
+    gap: 3.5mm;
+    align-items: flex-start;
+  }
+
+  .feature-card .ic {
+    width: 10mm;
+    height: 10mm;
+    border-radius: 10px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(30, 10, 90, 0.35);
+  }
+
+  .feature-card .ic svg { width: 5.5mm; height: 5.5mm; }
+
+  .ic-folder   { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+  .ic-clipboard{ background: linear-gradient(135deg, #8b5cf6, #d946ef); }
+  .ic-star     { background: linear-gradient(135deg, #f59e0b, #f97316); }
+  .ic-megaphone{ background: linear-gradient(135deg, #ef4444, #f97316); }
+  .ic-calendar { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+  .ic-academic { background: linear-gradient(135deg, #22c55e, #14b8a6); }
+  .ic-book     { background: linear-gradient(135deg, #f472b6, #a855f7); }
+  .ic-users    { background: linear-gradient(135deg, #facc15, #f97316); }
+
+  .feature-card h3 {
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 700;
+    font-size: 10.5pt;
+    color: #ffffff;
+    margin-bottom: 1.5mm;
+    line-height: 1.2;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .feature-card p { font-size: 7.5pt; color: rgba(255, 255, 255, 0.8); line-height: 1.55; }
+
+  /* ====== Assessment strip ====== */
+  .assess-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4mm; }
+
+  .assess-item { text-align: center; padding: 4mm 3mm; border-radius: 14px; }
+
+  .assess-item .label {
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 700;
+    font-size: 11pt;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .assess-item .desc { font-size: 7pt; color: rgba(255, 255, 255, 0.8); margin-top: 1.5mm; line-height: 1.5; }
+
+  .assess-item:nth-child(1) .label { color: #bfdbfe; }
+  .assess-item:nth-child(2) .label { color: #e9d5ff; }
+  .assess-item:nth-child(3) .label { color: #bbf7d0; }
+  .assess-item:nth-child(4) .label { color: #fed7aa; }
+  .assess-item:nth-child(5) .label { color: #fbcfe8; }
+
+  /* ====== Peran pengguna ====== */
+  .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; }
+
+  .role-card { border-radius: 16px; padding: 4.5mm 4.5mm; }
+
+  .role-head { display: flex; align-items: center; gap: 3mm; margin-bottom: 2.5mm; }
+
+  .avatar {
+    width: 10mm;
+    height: 10mm;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 9pt;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(30, 10, 90, 0.4);
+  }
+
+  .avatar.admin { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+  .avatar.guru  { background: linear-gradient(135deg, #a855f7, #6d28d9); }
+  .avatar.siswa { background: linear-gradient(135deg, #4ade80, #16a34a); }
+
+  .role-card h3 {
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 700;
+    font-size: 12pt;
+    color: #ffffff;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .role-card ul { list-style: none; }
+
+  .role-card li {
+    font-size: 8pt;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.65;
+    padding-left: 4mm;
+    position: relative;
+  }
+
+  .role-card li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 3.8mm;
+    width: 1.4mm;
+    height: 1.4mm;
+    border-radius: 50%;
+    background: #fde047;
+  }
+
+  /* ====== Teknologi ====== */
+  .tech { display: flex; justify-content: center; gap: 3.5mm; flex-wrap: wrap; }
+
+  .tech-badge {
+    padding: 2.5mm 5.5mm;
+    border-radius: 999px;
+    font-size: 9pt;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .t-next   { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .t-ts     { background: linear-gradient(135deg, #a855f7, #6d28d9); }
+  .t-tail   { background: linear-gradient(135deg, #06b6d4, #0284c7); }
+  .t-supa   { background: linear-gradient(135deg, #22c55e, #15803d); }
+  .t-pg     { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+  .t-vercel { background: linear-gradient(135deg, #f97316, #ea580c); }
+  .t-git    { background: linear-gradient(135deg, #64748b, #334155); }
+
+  /* ====== Footer ====== */
+  .footer { text-align: center; padding-top: 4mm; border-top: 1px solid rgba(255, 255, 255, 0.3); }
+
+  .footer .vision {
+    font-family: 'League Spartan', sans-serif;
+    font-weight: 700;
+    font-size: 10.5pt;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
+  }
+
+  .footer .vision span { color: #fde68a; }
+
+  .footer .meta {
+    margin-top: 3mm;
+    font-size: 7.5pt;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  /* ====== Tombol cetak ====== */
+  .print-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 50;
+    padding: 12px 22px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.5);
+  }
+
+  .print-btn:hover { transform: translateY(-2px); }
+
+  @media print {
+    .print-btn { display: none; }
+    body { background: #1e1b4b; }
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">Cetak / Simpan PDF</button>
+
+<div class="poster">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+
+  <div class="poster-inner">
+
+    <!-- ====== HEADER ====== -->
+    <div class="app-header glass">
+      <div class="brand">
+        <img src="./public/Logo sobat fusion.png" alt="FUSION Logo" />
+        <div>
+          <h1>FUSION</h1>
+          <p>Platform Manajemen Pembelajaran Sekolah Terintegrasi</p>
+        </div>
+      </div>
+      <div class="pill"><span class="dot"></span> v1.1 &middot; MVP</div>
+    </div>
+
+    <!-- ====== HERO ====== -->
+    <div class="hero">
+      <h1 class="text-gradient">FUSION</h1>
+      <div class="full-name">Future-Oriented Unified System for Education</div>
+      <div class="tagline">Satu Platform untuk Semua Kebutuhan Pembelajaran</div>
+      <div class="sub">
+        <strong>Pembelajaran</strong> &middot; <strong>Materi</strong> &middot; <strong>Tugas</strong> &middot;
+        <strong>Asesmen</strong> &middot; <strong>Nilai</strong> &middot; <strong>Dashboard</strong>
+      </div>
+      <div class="chips">
+        <span class="chip c-blue">Admin</span>
+        <span class="chip c-purple">Guru</span>
+        <span class="chip c-green">Siswa</span>
+        <span class="chip c-orange">Pembelajaran Berbasis Industri</span>
+      </div>
+    </div>
+
+    <!-- ====== MOCKUP DASHBOARD ====== -->
+    <div class="mockup">
+      <div class="mockup-top">
+        <div class="url">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          fusion-lms.vercel.app/dashboard
+        </div>
+        <div style="display:flex; gap:6px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:rgba(59,130,246,0.5);"></span>
+          <span style="width:8px;height:8px;border-radius:50%;background:rgba(139,92,246,0.5);"></span>
+        </div>
+      </div>
+
+      <div class="mockup-body">
+        <!-- Sidebar -->
+        <div class="mockup-sidebar">
+          <div class="ms-logo">
+            <img src="./public/Logo sobat fusion.png" alt="FUSION" />
+            <div>
+              <h4>FUSION</h4>
+              <span>admin</span>
+            </div>
+          </div>
+          <div class="ms-item active">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            Dashboard <span class="ms-dot"></span>
+          </div>
+          <div class="ms-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Guru</div>
+          <div class="ms-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>Siswa</div>
+          <div class="ms-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>Kelas</div>
+          <div class="ms-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>Mata Pelajaran</div>
+          <div class="ms-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>Kalender</div>
+        </div>
+
+        <!-- Main -->
+        <div class="mockup-main">
+          <div class="ms-header">
+            <div>
+              <h5>Selamat datang, Admin</h5>
+              <p>Ringkasan sekolah Anda</p>
+            </div>
+            <div class="ms-avatar">A</div>
+          </div>
+          <div class="ms-stats">
+            <div class="ms-stat">
+              <div class="ic"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
+              <div class="num">24</div>
+              <div class="lbl">Total Guru</div>
+            </div>
+            <div class="ms-stat">
+              <div class="ic"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
+              <div class="num">312</div>
+              <div class="lbl">Total Siswa</div>
+            </div>
+            <div class="ms-stat">
+              <div class="ic"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
+              <div class="num">12</div>
+              <div class="lbl">Total Kelas</div>
+            </div>
+            <div class="ms-stat">
+              <div class="ic"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div>
+              <div class="num">18</div>
+              <div class="lbl">Mata Pelajaran</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mockup-caption">Tampilan dashboard admin &mdash; seperti di aplikasi</div>
+
+    <!-- ====== FITUR UTAMA ====== -->
+    <div class="section-title">
+      <span class="st-dot d-blue"></span> Fitur Utama
+    </div>
+
+    <div class="features">
+      <div class="feature-card glass-card">
+        <div class="ic ic-folder"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg></div>
+        <div>
+          <h3>Materi Per Kelas</h3>
+          <p>Upload PDF, DOCX, PPT, &amp; Video YouTube per kelas. Siswa menandai materi selesai dipelajari.</p>
+        </div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="ic ic-clipboard"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg></div>
+        <div>
+          <h3>Assessment</h3>
+          <p>Pretest, post-test, kuis, LKPD &amp; tugas dengan deadline dan lampiran per kelas.</p>
+        </div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="ic ic-star"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></div>
+        <div>
+          <h3>Penilaian &amp; Rubrik</h3>
+          <p>Nilai, feedback, skor per kriteria rubrik dengan total otomatis + breakdown untuk siswa.</p>
+        </div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="ic ic-megaphone"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg></div>
+        <div>
+          <h3>Pengumuman</h3>
+          <p>Guru membuat pengumuman per kelas, siswa melihat pengumuman terbaru di dashboard.</p>
+        </div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="ic ic-calendar"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+        <div>
+          <h3>Kalender Akademik</h3>
+          <p>Event akademik, ujian, libur, dan tugas per kelas / global + jadwal hari ini untuk siswa.</p>
+        </div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="ic ic-academic"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
+        <div>
+          <h3>Kelas &amp; Kode Join</h3>
+          <p>Kelola kelas &amp; anggota, QR code, dan join kelas dengan kode kelas yang unik.</p>
+        </div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="ic ic-book"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div>
+        <div>
+          <h3>Kuis Online</h3>
+          <p>Soal pilihan ganda dengan auto-score dan soal isian yang dinilai guru, langsung di aplikasi.</p>
+        </div>
+      </div>
+      <div class="feature-card glass-card">
+        <div class="ic ic-users"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
+        <div>
+          <h3>3 Peran Pengguna</h3>
+          <p>Dashboard khusus Admin, Guru, dan Siswa sesuai hak akses masing-masing peran.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== JENIS ASSESSMENT ====== -->
+    <div class="section-title">
+      <span class="st-dot d-purple"></span> Jenis Assessment
+    </div>
+
+    <div class="assess-strip">
+      <div class="assess-item glass-card"><div class="label">Pretest</div><div class="desc">Mengukur kemampuan awal siswa</div></div>
+      <div class="assess-item glass-card"><div class="label">Post-test</div><div class="desc">Evaluasi hasil belajar</div></div>
+      <div class="assess-item glass-card"><div class="label">Kuis</div><div class="desc">PG auto-score &amp; isian</div></div>
+      <div class="assess-item glass-card"><div class="label">LKPD</div><div class="desc">Lembar kerja peserta didik</div></div>
+      <div class="assess-item glass-card"><div class="label">Tugas</div><div class="desc">Upload PDF, DOCX, PPT, ZIP</div></div>
+    </div>
+
+    <!-- ====== PERAN PENGGUNA ====== -->
+    <div class="section-title">
+      <span class="st-dot d-pink"></span> Peran Pengguna
+    </div>
+
+    <div class="roles">
+      <div class="role-card glass-card">
+        <div class="role-head">
+          <div class="avatar admin">A</div>
+          <h3>Admin</h3>
+        </div>
+        <ul>
+          <li>Mengelola seluruh data sekolah</li>
+          <li>CRUD guru, siswa, kelas &amp; mata pelajaran</li>
+          <li>Monitoring seluruh data &amp; kalender akademik</li>
+        </ul>
+      </div>
+      <div class="role-card glass-card">
+        <div class="role-head">
+          <div class="avatar guru">G</div>
+          <h3>Guru</h3>
+        </div>
+        <ul>
+          <li>Upload materi &amp; buat assessment per kelas</li>
+          <li>Soal kuis, rubrik penilaian, nilai &amp; feedback</li>
+          <li>Pengumuman &amp; kelola anggota kelas</li>
+        </ul>
+      </div>
+      <div class="role-card glass-card">
+        <div class="role-head">
+          <div class="avatar siswa">S</div>
+          <h3>Siswa</h3>
+        </div>
+        <ul>
+          <li>Join kelas via kode / QR code</li>
+          <li>Belajar, tandai materi selesai, kerjakan asesmen</li>
+          <li>Lihat nilai, feedback &amp; breakdown rubrik</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ====== TEKNOLOGI ====== -->
+    <div class="section-title">
+      <span class="st-dot d-orange"></span> Teknologi
+    </div>
+
+    <div class="tech">
+      <span class="tech-badge t-next">Next.js 14</span>
+      <span class="tech-badge t-ts">TypeScript</span>
+      <span class="tech-badge t-tail">Tailwind CSS</span>
+      <span class="tech-badge t-supa">Supabase</span>
+      <span class="tech-badge t-pg">PostgreSQL</span>
+      <span class="tech-badge t-vercel">Vercel</span>
+      <span class="tech-badge t-git">GitHub</span>
+    </div>
+
+    <!-- ====== FOOTER ====== -->
+    <div class="footer">
+      <div class="vision">
+        &ldquo;Menjadi platform pembelajaran sekolah yang <span>sederhana</span>, <span>modern</span>, dan <span>mudah digunakan</span>
+        untuk mendukung pembelajaran digital berbasis industri.&rdquo;
+      </div>
+      <div class="meta">&copy; 2025 FUSION LMS. All rights reserved. &middot; Platform Manajemen Pembelajaran Sekolah Terintegrasi</div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
